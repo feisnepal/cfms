@@ -1,0 +1,48 @@
+{
+  "name": "Community Forest Management",
+
+  // H1.3 / S1-25 — the container is the supported development environment.
+  //
+  // A local interpreter is not. When one was, this project drifted to Python
+  // 3.14 against a 3.11 pin, geopandas 1.1.2 against a pinned 0.14.1, and arq
+  // missing entirely — so 317 of 783 backend tests failed locally while CI was
+  // a different story. Pinning versions in a file only helps if something
+  // enforces them; this is that something.
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../docker-compose.dev.yml"
+  ],
+  "service": "backend",
+  "workspaceFolder": "/app",
+
+  // Bring the whole stack up: PostGIS and Redis are not optional for the test
+  // suite, which builds its schema by running the real migrations (H1.6).
+  "runServices": ["db", "redis", "backend"],
+
+  "forwardPorts": [8001, 3001, 5432, 6379],
+  "portsAttributes": {
+    "8001": { "label": "backend (FastAPI)" },
+    "3001": { "label": "frontend (Vite)" },
+    "5432": { "label": "postgres + postgis" },
+    "6379": { "label": "redis" }
+  },
+
+  "postCreateCommand": "python -m pip install --no-cache-dir -r requirements.txt",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "dbaeumer.vscode-eslint"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"]
+      }
+    }
+  }
+}

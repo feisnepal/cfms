@@ -1,0 +1,5 @@
+{
+  "_comment": "Known TypeScript errors, keyed file|TScode. Expected to SHRINK. Regenerate with: node scripts/check-tsc-baseline.mjs --update",
+  "total": 0,
+  "errors": {}
+}

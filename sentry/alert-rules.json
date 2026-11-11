@@ -1,0 +1,182 @@
+{
+  "_description": "Metric Alerts for Performance Thresholds (Phase 10). Apply via the Sentry API or, preferably, via Terraform (terraform/sentry.tf mirrors these rules 1:1).",
+  "_measurement_keys": {
+    "measurements.map-init": "WorkspaceTab lazy chunk load (Phase 10)",
+    "measurements.tab-switch": "useTabSwitchTiming (Phase 10)",
+    "measurements.lcp": "Sentry browser tracing Web Vitals (Phase 8)",
+    "event.type:error tags.tab": "TabErrorBoundary scope tag (Phase 4)"
+  },
+  "alerts": [
+    {
+      "name": "Map Init Time > 3s (p75)",
+      "type": "metric",
+      "dataset": "transactions",
+      "query": "event.type:transaction transaction.op:pageload",
+      "aggregate": "p75(measurements.map-init)",
+      "timeWindow": 30,
+      "thresholdType": 0,
+      "triggers": [
+        {
+          "label": "critical",
+          "alertThreshold": 3000,
+          "resolveThreshold": 2500,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-performance",
+              "integrationId": 12345
+            },
+            {
+              "type": "pagerduty",
+              "targetType": "specific",
+              "targetIdentifier": "pagerduty-service-id",
+              "integrationId": 67890
+            }
+          ]
+        },
+        {
+          "label": "warning",
+          "alertThreshold": 2000,
+          "resolveThreshold": 1500,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-performance",
+              "integrationId": 12345
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tab Switch > 100ms (p95)",
+      "type": "metric",
+      "dataset": "transactions",
+      "query": "event.type:transaction transaction.op:ui.action",
+      "aggregate": "p95(measurements.tab-switch)",
+      "timeWindow": 15,
+      "thresholdType": 0,
+      "triggers": [
+        {
+          "label": "warning",
+          "alertThreshold": 100,
+          "resolveThreshold": 80,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-ux",
+              "integrationId": 12345
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LCP > 2.5s (p75)",
+      "type": "metric",
+      "dataset": "transactions",
+      "query": "event.type:transaction transaction.op:pageload",
+      "aggregate": "p75(measurements.lcp)",
+      "timeWindow": 60,
+      "thresholdType": 0,
+      "triggers": [
+        {
+          "label": "critical",
+          "alertThreshold": 4000,
+          "resolveThreshold": 2500,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-performance",
+              "integrationId": 12345
+            }
+          ]
+        },
+        {
+          "label": "warning",
+          "alertThreshold": 2500,
+          "resolveThreshold": 2000,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-performance",
+              "integrationId": 12345
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Error Rate by Tab > 1%",
+      "type": "metric",
+      "dataset": "events",
+      "query": "event.type:error tags.tab:*",
+      "aggregate": "percentage(sessions_crashed, sessions)",
+      "timeWindow": 60,
+      "thresholdType": 0,
+      "triggers": [
+        {
+          "label": "critical",
+          "alertThreshold": 5,
+          "resolveThreshold": 1,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-errors",
+              "integrationId": 12345
+            },
+            {
+              "type": "pagerduty",
+              "targetType": "specific",
+              "targetIdentifier": "pagerduty-service-id",
+              "integrationId": 67890
+            }
+          ]
+        },
+        {
+          "label": "warning",
+          "alertThreshold": 1,
+          "resolveThreshold": 0.5,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-errors",
+              "integrationId": 12345
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "API Response Time > 2s (p95)",
+      "type": "metric",
+      "dataset": "transactions",
+      "query": "event.type:transaction transaction.op:http.server",
+      "aggregate": "p95(transaction.duration)",
+      "timeWindow": 15,
+      "thresholdType": 0,
+      "triggers": [
+        {
+          "label": "warning",
+          "alertThreshold": 2000,
+          "resolveThreshold": 1500,
+          "actions": [
+            {
+              "type": "slack",
+              "targetType": "specific",
+              "targetIdentifier": "#alerts-backend",
+              "integrationId": 12345
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

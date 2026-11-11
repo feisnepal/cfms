@@ -1,0 +1,118 @@
+{
+  "_description": "Calculation Detail — Performance & Health dashboard (Phase 10). Import via Sentry API: curl -X POST https://sentry.io/api/0/organizations/{org}/dashboards/ -H \"Authorization: Bearer {token}\" -d @sentry/dashboard-config.json",
+  "_measurement_keys": {
+    "measurements.map-init": "WorkspaceTab lazy chunk load (Phase 10)",
+    "measurements.tab-switch": "useTabSwitchTiming (Phase 10)",
+    "measurements.lcp": "Sentry browser tracing Web Vitals (Phase 8)",
+    "event.type:error tags.tab": "TabErrorBoundary scope tag (Phase 4)",
+    "Slow React Render": "onRenderCallback captureMessage (Phase 8)"
+  },
+  "title": "Calculation Detail — Performance & Health",
+  "widgetDisplay": [
+    {
+      "title": "Map Init Time (p75/p95)",
+      "displayType": "line",
+      "interval": "1h",
+      "queries": [
+        {
+          "name": "Map Init p75",
+          "fields": ["p75(measurements.map-init)"],
+          "aggregations": ["p75(measurements.map-init)"],
+          "conditions": "event.type:transaction transaction.op:pageload",
+          "orderby": "-p75(measurements.map-init)"
+        },
+        {
+          "name": "Map Init p95",
+          "fields": ["p95(measurements.map-init)"],
+          "aggregations": ["p95(measurements.map-init)"],
+          "conditions": "event.type:transaction transaction.op:pageload",
+          "orderby": "-p95(measurements.map-init)"
+        }
+      ],
+      "yAxis": ["p75(measurements.map-init)", "p95(measurements.map-init)"]
+    },
+    {
+      "title": "Tab Switch Duration",
+      "displayType": "bar",
+      "interval": "1h",
+      "queries": [
+        {
+          "name": "Tab Switch Duration",
+          "fields": ["avg(measurements.tab-switch)", "count()"],
+          "aggregations": ["avg(measurements.tab-switch)", "count()"],
+          "conditions": "event.type:transaction transaction.op:ui.action",
+          "orderby": "-avg(measurements.tab-switch)"
+        }
+      ]
+    },
+    {
+      "title": "Web Vitals — LCP Distribution",
+      "displayType": "area",
+      "interval": "1h",
+      "queries": [
+        {
+          "name": "LCP Good (<2.5s)",
+          "fields": ["count()"],
+          "aggregations": ["count()"],
+          "conditions": "event.type:transaction measurements.lcp:<2500"
+        },
+        {
+          "name": "LCP Needs Improvement (2.5-4s)",
+          "fields": ["count()"],
+          "aggregations": ["count()"],
+          "conditions": "event.type:transaction measurements.lcp:>=2500 measurements.lcp:<4000"
+        },
+        {
+          "name": "LCP Poor (>4s)",
+          "fields": ["count()"],
+          "aggregations": ["count()"],
+          "conditions": "event.type:transaction measurements.lcp:>=4000"
+        }
+      ]
+    },
+    {
+      "title": "Chunk Load Time (Map Workspace)",
+      "displayType": "line",
+      "interval": "1h",
+      "queries": [
+        {
+          "name": "Map Chunk Load",
+          "fields": ["p75(measurements.map-init)", "p95(measurements.map-init)"],
+          "aggregations": ["p75(measurements.map-init)", "p95(measurements.map-init)"],
+          "conditions": "event.type:transaction transaction.op:resource",
+          "orderby": "-p75(measurements.map-init)"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate by Tab",
+      "displayType": "table",
+      "interval": "1h",
+      "queries": [
+        {
+          "name": "Errors",
+          "fields": ["count()", "tags[tab]", "title"],
+          "aggregations": ["count()"],
+          "conditions": "event.type:error tags.tab:*",
+          "orderby": "-count()",
+          "limit": 10
+        }
+      ]
+    },
+    {
+      "title": "Slow React Renders (>16ms)",
+      "displayType": "table",
+      "interval": "1h",
+      "queries": [
+        {
+          "name": "Slow Renders",
+          "fields": ["count()", "tags[component]"],
+          "aggregations": ["count()"],
+          "conditions": "event.type:error message:\"Slow React Render\"",
+          "orderby": "-count()",
+          "limit": 10
+        }
+      ]
+    }
+  ]
+}

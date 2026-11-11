@@ -1,0 +1,133 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:16-3.4-alpine
+    environment:
+      POSTGRES_DB: cf_db
+      POSTGRES_USER: postgres
+      # H1.13 / S2-69: from the environment (see .env.example), not inlined.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/cf_db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env — min 32 chars}
+      # H2.6 / S2-06: DEBUG must stay false here. It disables HSTS and CSP,
+      # echoes SQL, returns exception detail to clients, and binds uvicorn to
+      # 0.0.0.0. Use docker-compose.dev.yml for development.
+      DEBUG: "false"
+      LOG_FORMAT: text
+      # H2.18 / S2-08: the frontend's nginx is the only thing that talks to
+      # this service, and it is the hop whose X-Forwarded-For may be believed.
+      # The default compose bridge hands out 172.16.0.0/12; scope this to the
+      # real proxy address in any deployment that has one, and never to "*" —
+      # a peer we do not run can forge the header and take on any identity,
+      # including someone else's rate-limit budget.
+      FORWARDED_ALLOW_IPS: "172.16.0.0/12"
+      TRUSTED_PROXY_IPS: "172.16.0.0/12"
+    ports:
+      - "8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      # Named volumes, not host bind mounts, and not for tidiness: since H5.1
+      # this container runs as appuser (uid 10001). A bind mount arrives owned
+      # by the HOST user, so the container could not create anything inside it
+      # -- on a CI runner that is uid 1001, and uid 10001 has no claim on it.
+      # A named volume is initialised from the image, where these directories
+      # are already appuser-owned, so the running user can write to them.
+      #
+      # This is what broke compose-smoke: the backend was not slow to start, it
+      # was raising PermissionError creating uploads/translations at import.
+      # deploy/docker-compose.prod.yml already uses named volumes here; the
+      # difference between the two files was an oversight, not a decision.
+      #
+      # The cost is that uploads are no longer visible in ./uploads on the host
+      # during development. `docker compose cp backend:/app/uploads ./uploads`
+      # retrieves them when that is actually wanted.
+      - uploads:/app/uploads
+      - exports:/app/exports
+
+  calculation_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python -m app.calculation_worker
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/cf_db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env — min 32 chars}
+      # H2.6 / S2-06: DEBUG must stay false here. It disables HSTS and CSP,
+      # echoes SQL, returns exception detail to clients, and binds uvicorn to
+      # 0.0.0.0. Use docker-compose.dev.yml for development.
+      DEBUG: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      # The worker writes exports and reads uploads, so it must share both with
+      # the backend or a file produced here is invisible there. It had neither,
+      # while deploy/docker-compose.prod.yml gives it both -- the same oversight
+      # as the backend's bind mounts above, found in the same pass.
+      - uploads:/app/uploads
+      - exports:/app/exports
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # H1.10 / S1-26: the published port must match what the container actually
+    # binds. "3001:3000" once mapped to a port nothing was bound to and the
+    # frontend was unreachable. H5.1 moved the container side from 80 to 8080
+    # when the image became non-root; nginx.conf moved with it.
+    #
+    # VITE_API_URL is intentionally absent: Vite inlines env vars at BUILD time,
+    # so setting it as a runtime variable on an nginx container does nothing.
+    # The bundle calls same-origin /api/*, which nginx proxies to the backend.
+    #
+    # The ./frontend:/app bind mount is also gone. It served no purpose here
+    # (built assets live at /usr/share/nginx/html) and belongs to the Vite dev
+    # server, which docker-compose.dev.yml provides.
+    ports:
+      # H5.1: container-side 8080 — the image is nginx-unprivileged and runs as a
+      # non-root user, which cannot bind 80. The published port is unchanged, so
+      # nothing outside this file moves.
+      - "3001:8080"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  uploads:
+  exports:

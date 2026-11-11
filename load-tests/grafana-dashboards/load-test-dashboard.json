@@ -1,0 +1,84 @@
+{
+  "dashboard": {
+    "title": "Load Test: Calculation Detail (k6)",
+    "tags": ["load-test", "k6", "performance"],
+    "timezone": "utc",
+    "panels": [
+      {
+        "title": "Virtual Users",
+        "type": "graph",
+        "targets": [
+          {
+            "measurement": "vus",
+            "groupBy": [{ "type": "time", "params": ["10s"] }],
+            "select": [[{ "type": "field", "params": ["value"] }, { "type": "mean" }]]
+          }
+        ],
+        "yaxes": [{ "label": "VUs" }]
+      },
+      {
+        "title": "Map Init Time (p75/p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "measurement": "map_init_time",
+            "groupBy": [{ "type": "time", "params": ["10s"] }],
+            "select": [
+              [{ "type": "field", "params": ["value"] }, { "type": "percentile", "params": [75] }],
+              [{ "type": "field", "params": ["value"] }, { "type": "percentile", "params": [95] }]
+            ]
+          }
+        ],
+        "yaxes": [{ "label": "ms", "max": 5000 }],
+        "thresholds": [
+          { "op": "gt", "value": 3000, "colorMode": "critical", "fill": true, "line": true },
+          { "op": "gt", "value": 2000, "colorMode": "warning", "fill": true, "line": true }
+        ]
+      },
+      {
+        "title": "HTTP Response Time (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "measurement": "http_req_duration",
+            "groupBy": [{ "type": "time", "params": ["10s"] }],
+            "select": [[{ "type": "field", "params": ["value"] }, { "type": "percentile", "params": [95] }]]
+          }
+        ],
+        "yaxes": [{ "label": "ms", "max": 3000 }],
+        "thresholds": [
+          { "op": "gt", "value": 2000, "colorMode": "critical", "fill": true, "line": true }
+        ]
+      },
+      {
+        "title": "API Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "measurement": "api_errors",
+            "groupBy": [{ "type": "time", "params": ["10s"] }],
+            "select": [[{ "type": "field", "params": ["value"] }, { "type": "mean" }]]
+          }
+        ],
+        "yaxes": [{ "label": "rate", "max": 1 }],
+        "thresholds": [
+          { "op": "gt", "value": 0.01, "colorMode": "critical", "fill": true, "line": true }
+        ]
+      },
+      {
+        "title": "Request Rate by Endpoint",
+        "type": "graph",
+        "targets": [
+          {
+            "measurement": "http_reqs",
+            "groupBy": [
+              { "type": "time", "params": ["10s"] },
+              { "type": "tag", "params": ["endpoint"] }
+            ],
+            "select": [[{ "type": "field", "params": ["value"] }, { "type": "count" }]]
+          }
+        ]
+      }
+    ]
+  }
+}

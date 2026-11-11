@@ -1,0 +1,21 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Comp A" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.302, 27.602], [85.306, 27.602], [85.306, 27.606], [85.302, 27.606], [85.302, 27.602]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Comp B" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.3065, 27.602], [85.3095, 27.602], [85.3095, 27.606], [85.3065, 27.606], [85.3065, 27.602]]]
+      }
+    }
+  ]
+}

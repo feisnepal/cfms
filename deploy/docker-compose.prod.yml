@@ -1,0 +1,151 @@
+# Production stack for a single VPS, deployed over SSH (H5.2 / S2-28).
+#
+# This is NOT the repository's docker-compose.yml with different values. That
+# file is for development and three of its choices are actively dangerous on a
+# server:
+#
+#   • `build:` — a server should run the image CI built and scanned, not compile
+#     its own from whatever happens to be on disk.
+#   • `- ./backend:/app` — a bind mount of source code OVER the image's code.
+#     On a VPS the deployed application would be whatever is in that directory,
+#     and the image tag would become a lie.
+#   • published `5432` and `6379` — Postgres and Redis reachable from the
+#     internet. Neither needs to leave the compose network.
+#
+# Nothing here publishes to a public interface. The frontend binds to localhost
+# only; a reverse proxy on the host (nginx, Caddy) terminates TLS and forwards
+# to it. See runbooks/RUNBOOK-DEPLOY-001.md.
+#
+# Required in /srv/cfms/.env on the server (never in this file, never in git):
+#   IMAGE_TAG, REGISTRY, POSTGRES_PASSWORD, SECRET_KEY, METRICS_TOKEN
+
+name: cfms
+
+services:
+  db:
+    image: postgis/postgis:16-3.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cf_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in /srv/cfms/.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Deliberately no `ports:`. Reachable only from the compose network. The
+    # deploy pipeline migrates by running alembic INSIDE this network rather
+    # than by exposing the database to a CI runner.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    # Pulled by immutable tag, never built here and never `latest` — a rollback
+    # needs a name for the thing it is going back to.
+    image: ${REGISTRY:?set REGISTRY}/cf-backend:${IMAGE_TAG:?set IMAGE_TAG}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/cf_db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY — min 32 chars}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+      # H2.6 / S3-11: DEBUG=false is what keeps HSTS and CSP on, keeps SQL out
+      # of the logs, keeps exception detail out of responses, and keeps /docs
+      # closed. The smoke suite checks the last of these on every deploy.
+      DEBUG: "false"
+      LOG_FORMAT: json
+      # H2.18 / S2-08: only the frontend's nginx talks to this service, and it
+      # is the single hop whose X-Forwarded-For may be believed. Never "*" — any
+      # peer could then claim any identity, including someone else's rate limit.
+      FORWARDED_ALLOW_IPS: "172.16.0.0/12"
+      TRUSTED_PROXY_IPS: "172.16.0.0/12"
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    volumes:
+      # Named volumes, not host paths: uploads and exports must survive a
+      # deploy, and must not depend on a directory somebody created by hand.
+      - uploads:/app/uploads
+      - exports:/app/exports
+    # No `ports:`. nginx reaches it over the compose network.
+
+  calculation_worker:
+    image: ${REGISTRY:?set REGISTRY}/cf-backend:${IMAGE_TAG:?set IMAGE_TAG}
+    restart: unless-stopped
+    command: python -m app.calculation_worker
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/cf_db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: "false"
+      LOG_FORMAT: json
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    volumes:
+      - uploads:/app/uploads
+      - exports:/app/exports
+
+  frontend:
+    image: ${REGISTRY:?set REGISTRY}/cf-frontend:${IMAGE_TAG:?set IMAGE_TAG}
+    restart: unless-stopped
+    ports:
+      # 127.0.0.1 ONLY. Binding 0.0.0.0 here would serve the application over
+      # plain HTTP to the internet, which for a system holding household PII is
+      # not a deployment, it is an incident. The host's reverse proxy terminates
+      # TLS and forwards to this port.
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - backend
+
+  # ── monitoring (H5.7) ─────────────────────────────────────────────────
+  # Behind a profile: `docker compose --profile monitoring up -d`. A plain
+  # deploy does not start these, so the SLO stack is opt-in and costs a
+  # deployment that does not want it nothing.
+  #
+  # Neither publishes a port. Reach them over SSH:
+  #   ssh -L 9090:localhost:9090 deploy@<host>
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    profiles: [monitoring]
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/slo-rules.yml:/etc/prometheus/slo-rules.yml:ro
+      # The scrape token, written by the deploy from .env. A file rather than an
+      # inline value so it is not visible in `docker inspect`.
+      - ./prometheus/metrics_token:/etc/prometheus/metrics_token:ro
+      - promdata:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    depends_on: [backend]
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    profiles: [monitoring]
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertdata:/alertmanager
+
+volumes:
+  pgdata:
+  redisdata:
+  uploads:
+  exports:
+  promdata:
+  alertdata:

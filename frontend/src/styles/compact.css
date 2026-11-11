@@ -1,0 +1,164 @@
+/* Compact Layout Utilities for Block Configuration Pages */
+
+.compact-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.compact-header {
+  padding: 12px 16px;
+  min-height: 60px;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+  flex-shrink: 0;
+}
+
+.compact-map-area {
+  flex: 1;
+  min-height: 0; /* Important for flex child to respect parent height */
+  position: relative;
+}
+
+.compact-controls {
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  max-height: 25vh;
+  flex-shrink: 0;
+}
+
+.compact-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: nowrap;
+}
+
+.compact-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.compact-radio-label input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.compact-input {
+  padding: 6px 12px;
+  font-size: 14px;
+  height: 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.compact-input:focus {
+  border-color: #3b82f6;
+  ring: 2px;
+  ring-color: #3b82f64d;
+}
+
+.compact-help-text {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.compact-button {
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.compact-button-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.compact-button-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.compact-button-primary:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.compact-button-secondary {
+  background-color: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.compact-button-secondary:hover:not(:disabled) {
+  background-color: #f9fafb;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .compact-controls-row {
+    gap: 16px;
+  }
+
+  .compact-input {
+    font-size: 13px;
+  }
+
+  .compact-controls {
+    max-height: 30vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .compact-controls-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .compact-header {
+    padding: 10px 12px;
+  }
+
+  .compact-controls {
+    padding: 10px 12px;
+    max-height: 35vh;
+  }
+}
+
+/* Leaflet map specific adjustments for compact layout */
+.compact-map-area .leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Status indicator */
+.compact-status {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.compact-status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.compact-status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}

@@ -1,0 +1,815 @@
+{
+ "version": 1,
+ "activities": [
+  {
+   "id": 1,
+   "ne": "नर्सरी निर्माण",
+   "en": "Build a nursery",
+   "terms": "nursery, nurseri, narsari, nirman, construction, tree, seedling, raise, plants, new"
+  },
+  {
+   "id": 2,
+   "ne": "नर्सरी मर्मत",
+   "en": "Repair a nursery",
+   "terms": "nursery, nurseri, narsari, marmat, repair, maintain, fix, upkeep"
+  },
+  {
+   "id": 3,
+   "ne": "बिरुवा उत्पादन, बिक्री वितरण तथा बिरुवा खरिद",
+   "en": "Seedling production, sale, distribution and purchase",
+   "terms": "biruwa, seedling, plant, utpadan, production, bikri, sale, bitaran, distribution, kharid, purchase, seedlings, plants, sell, buy, raise"
+  },
+  {
+   "id": 4,
+   "ne": "वृक्षारोपण/समृद्धि वृक्षारोपण",
+   "en": "Tree planting / enrichment planting",
+   "terms": "brikshyaropan, brikshaaropan, planting, plantation, afforestation, reforestation, trees, plant"
+  },
+  {
+   "id": 5,
+   "ne": "बिउ छुर्ने कार्य",
+   "en": "Seed sowing",
+   "terms": "biu, seed, sow, seeds, direct, seeding, broadcast"
+  },
+  {
+   "id": 6,
+   "ne": "निजी जग्गामा वृक्षारोपणका लागि बिरुवा वितरण",
+   "en": "Seedling distribution for planting on private land",
+   "terms": "niji, private, jagga, land, biruwa, seedling, plant, bitaran, distribution, give, seedlings, farmers, trees"
+  },
+  {
+   "id": 7,
+   "ne": "वनस्पति उद्यान/हरित उद्यान निर्माण",
+   "en": "Botanical garden / green garden construction",
+   "terms": "udyan, garden, park, harit, green, nirman, construction, botanic"
+  },
+  {
+   "id": 8,
+   "ne": "वन कार्ययोजना निर्माण तथा पूनरावलोकन",
+   "en": "Forest operational plan preparation and revision",
+   "terms": "van, ban, forest, jungle, karyayojana, plan, operational, nirman, construction, punaravalokan, review, management, op, renew, update"
+  },
+  {
+   "id": 9,
+   "ne": "वन वीउ बगैचा स्थापना",
+   "en": "Forest seed orchard establishment",
+   "terms": "van, ban, forest, jungle, biu, seed, bagaincha, garden, orchard, source"
+  },
+  {
+   "id": 10,
+   "ne": "बन सिमांकन",
+   "en": "Forest boundary demarcation",
+   "terms": "van, ban, forest, jungle, simankan, boundary, pillars, markers, signboard, fence, line, border"
+  },
+  {
+   "id": 11,
+   "ne": "चरिचरण नियन्त्रण",
+   "en": "Grazing control",
+   "terms": "charicharan, grazing, niyantran, control, cattle, livestock, ban, open"
+  },
+  {
+   "id": 12,
+   "ne": "अग्नि नियन्त्रण रेखा निर्माण तथा मर्मतसम्भार",
+   "en": "Fire line construction and maintenance",
+   "terms": "agni, fire, niyantran, control, nirman, construction, break, firebreak, fireline, cleared, strip"
+  },
+  {
+   "id": 13,
+   "ne": "अग्नि नियन्त्रण गोष्ठी",
+   "en": "Fire control meeting",
+   "terms": "agni, fire, niyantran, control, goshthi, meeting, seminar, wildfire, discussion"
+  },
+  {
+   "id": 14,
+   "ne": "डढेलो नियन्त्रण सम्बन्धी प्रचार-प्रसार कार्यक्रम (पत्र पत्रिका, सडक नाटक, रेडियो कार्यकम,आदि)",
+   "en": "Forest-fire awareness campaign (press, street drama, radio)",
+   "terms": "dadhelo, wildfire, fire, niyantran, control, publicity, awareness, radio, drama, advertisement"
+  },
+  {
+   "id": 15,
+   "ne": "वन अतिकमण हटाउने",
+   "en": "Removing forest encroachment",
+   "terms": "van, ban, forest, jungle, atikraman, encroachment, illegal, occupation, clearing, land, grabbing, evict"
+  },
+  {
+   "id": 16,
+   "ne": "वन हेरालुद्वारा संरक्षण",
+   "en": "Forest protection by forest guards",
+   "terms": "van, ban, forest, jungle, heralu, guard, watcher, sanrakshan, conservation, protection, patrol, paid"
+  },
+  {
+   "id": 17,
+   "ne": "समूहबाट पालैपालो रेखदेख",
+   "en": "Members patrol the forest by turns",
+   "terms": "rekhdekh, patrol, supervision, rotation, volunteers, guarding"
+  },
+  {
+   "id": 18,
+   "ne": "तारबार गरी संरक्षण",
+   "en": "Protection by fencing",
+   "terms": "tarbar, fence, fencing, sanrakshan, conservation, protection, wire, barbed, enclose"
+  },
+  {
+   "id": 19,
+   "ne": "बन कार्ययोजना तयारी तथा संशोधन",
+   "en": "Forest operational plan preparation and amendment",
+   "terms": "van, ban, forest, jungle, karyayojana, plan, operational, sansodhan, amendment, revision, management, op, renew, update, revise"
+  },
+  {
+   "id": 20,
+   "ne": "तारबार गरी पुनरुत्पादन संरक्षण",
+   "en": "Protecting natural regeneration by fencing",
+   "terms": "tarbar, fence, fencing, punarutpadan, regeneration, sanrakshan, conservation, protection, anr, fenced, closure, enclosure"
+  },
+  {
+   "id": 21,
+   "ne": "ब्लकको स्थलगत रेखांकन",
+   "en": "Marking block boundaries in the field",
+   "terms": "block, sthalgat, field, rekhankan, marking, boundary, survey, compartment"
+  },
+  {
+   "id": 22,
+   "ne": "वनपथ निर्माण",
+   "en": "Forest road construction",
+   "terms": "vanpath, forest, road, track, nirman, construction, path, access"
+  },
+  {
+   "id": 23,
+   "ne": "झाडी सफाई",
+   "en": "Bush and undergrowth cleaning",
+   "terms": "jhadi, bush, shrub, safai, cleaning, weeding, clearing, brush"
+  },
+  {
+   "id": 24,
+   "ne": "पत्ल्याउने",
+   "en": "Thinning",
+   "terms": "patlyaune, thinning, thin, dense, stand, poles, reduce"
+  },
+  {
+   "id": 25,
+   "ne": "हांगा काटछाट",
+   "en": "Pruning of branches",
+   "terms": "hanga, branch, katchhat, pruning, lopping, cutting, branches, trimming"
+  },
+  {
+   "id": 26,
+   "ne": "एक्ल्याउने",
+   "en": "Singling (one shoot per stump)",
+   "terms": "eklyaune, singling, coppice, shoots, stump, select"
+  },
+  {
+   "id": 27,
+   "ne": "अनुसन्धान प्लट स्थापना",
+   "en": "Research plot establishment",
+   "terms": "anusandhan, research, plot, sample, permanent, study, experiment"
+  },
+  {
+   "id": 28,
+   "ne": "वन मापन",
+   "en": "Forest measurement (inventory)",
+   "terms": "van, ban, forest, jungle, mapan, measurement, inventory, survey, measure, trees, growing, stock"
+  },
+  {
+   "id": 29,
+   "ne": "बन सदुपयोग कार्ययोजना तयारी",
+   "en": "Forest utilisation plan preparation",
+   "terms": "van, ban, forest, jungle, sadupayog, utilisation, utilization, karyayojana, plan, operational, harvest, use"
+  },
+  {
+   "id": 30,
+   "ne": "काठ",
+   "en": "Timber harvesting",
+   "terms": "kath, timber, wood, logs, sawn, cutting, felling, coupe, cubic, feet, cft"
+  },
+  {
+   "id": 31,
+   "ne": "दाउरा",
+   "en": "Fuelwood collection",
+   "terms": "daura, fuelwood, firewood, fuel, wood, bundle, stack"
+  },
+  {
+   "id": 32,
+   "ne": "जडिबुटी संकलन",
+   "en": "Medicinal herb collection",
+   "terms": "jadibuti, herbs, medicinal, sankalan, collection, plants, ayurveda"
+  },
+  {
+   "id": 33,
+   "ne": "गैरकाष्ठ वनपैदावार संकलन",
+   "en": "Non-timber forest product (NTFP) collection",
+   "terms": "gairkasth, non, timber, ntfp, vanpaidawar, forest, product, sankalan, collection, wood, products"
+  },
+  {
+   "id": 34,
+   "ne": "स्याउला-सोत्तर संकलन",
+   "en": "Leaf litter collection",
+   "terms": "syaula, litter, sottar, sankalan, collection, compost, duff, leaves, bedding"
+  },
+  {
+   "id": 35,
+   "ne": "भुईं घास संकलन",
+   "en": "Ground grass collection",
+   "terms": "bhuin, ground, sankalan, collection, grass, fodder, cut"
+  },
+  {
+   "id": 36,
+   "ne": "डालेघांस संकलन",
+   "en": "Tree fodder (branch fodder) collection",
+   "terms": "daleghans, tree, fodder, sankalan, collection, lopping, leaves, animals, feed"
+  },
+  {
+   "id": 37,
+   "ne": "प्रकोप पिडितलाई वन पैदावार वितरण",
+   "en": "Forest products for disaster victims",
+   "terms": "prakop, disaster, pidit, victim, van, ban, forest, jungle, paidawar, product, bitaran, distribution, relief, flood, landslide, fire, victims, timber, support"
+  },
+  {
+   "id": 38,
+   "ne": "सामुदायिक बनको कार्ययोजना र विधान सम्बन्धी अभिमुखीकरण",
+   "en": "Orientation on the community forest plan and constitution",
+   "terms": "samudayik, community, karyayojana, plan, operational, bidhan, constitution, abhimukhikaran, orientation, training, meeting, rules"
+  },
+  {
+   "id": 39,
+   "ne": "विपन्न, महिला, दलित, मधेशी, आदिवासी जनजाति, अपांगता भएका व्यक्ति तथा पिछुडिएको वर्गलाई सा.व. सम्बन्धी जनचेतना गोष्ठी",
+   "en": "Awareness meeting for poor, women, Dalit, Madhesi, indigenous and marginalised groups",
+   "terms": "bipanna, poor, mahila, women, dalit, aadibasi, indigenous, janachetana, awareness, goshthi, meeting, seminar, social, inclusion, disadvantaged, gesi"
+  },
+  {
+   "id": 40,
+   "ne": "सामुदायिक बनको बन संवर्द्धन प्रणालीमा आधारित दिगो वन व्यवस्थापन तालिम",
+   "en": "Sustainable forest management training (silvicultural system)",
+   "terms": "samudayik, community, van, ban, forest, jungle, sambardhan, silviculture, byabasthapan, management, talim, training, sfm"
+  },
+  {
+   "id": 41,
+   "ne": "नर्सरी व्यवस्थापन तालिम",
+   "en": "Nursery management training",
+   "terms": "nursery, nurseri, narsari, byabasthapan, management, talim, training, seedling"
+  },
+  {
+   "id": 42,
+   "ne": "गैरकाष्ठ वनपैदाबार व्यवस्थापन तालिम",
+   "en": "NTFP management training",
+   "terms": "gairkasth, non, timber, ntfp, vanpaidawar, forest, product, byabasthapan, management, talim, training, herbs"
+  },
+  {
+   "id": 43,
+   "ne": "समूह व्यवस्थापन तालिम",
+   "en": "Group management training",
+   "terms": "samuha, group, byabasthapan, management, talim, training, committee, governance"
+  },
+  {
+   "id": 44,
+   "ne": "नेतृत्व विकास तालिम",
+   "en": "Leadership development training",
+   "terms": "netritwa, leadership, bikas, development, talim, training, leaders, capacity"
+  },
+  {
+   "id": 45,
+   "ne": "लेखा तथा अभिलेख व्यवस्थापन तालिम",
+   "en": "Accounts and record-keeping training",
+   "terms": "lekha, accounts, abhilekh, record, byabasthapan, management, talim, training, bookkeeping, finance, audit"
+  },
+  {
+   "id": 46,
+   "ne": "विद्यार्थी तथा शिक्षकसंग सामुदायिक वन सम्बन्धी अन्तरक्रिया गोष्ठी",
+   "en": "Interaction with students and teachers on community forestry",
+   "terms": "bidyarthi, student, shikshak, teacher, samudayik, community, van, ban, forest, jungle, goshthi, meeting, seminar, school, visit, talk, interaction"
+  },
+  {
+   "id": 47,
+   "ne": "स्कूल तथा कलेजका विद्यार्थीहरूका लागि सा.व. तथा वातावरण सम्बन्धी चित्रकला, वकृत्वकला, निबन्ध, हाजिरी जवाफ प्रतियोगिता",
+   "en": "School and college competitions on forestry and environment",
+   "terms": "pratiyogita, competition, drawing, speech, essay, quiz, students"
+  },
+  {
+   "id": 48,
+   "ne": "उपभोक्ता समूहका सदस्यहरुको अध्ययन भ्रमण-जिल्ला (भित्र/बाहिर)",
+   "en": "Study tour for group members (inside / outside the district)",
+   "terms": "upabhokta, user, adhyayan, study, bhraman, tour, travel, exposure, visit, field"
+  },
+  {
+   "id": 49,
+   "ne": "समूहको आवश्यकता र उपभोक्ताहरूको चाहना अनुसार विभिन्न सीपमूलक तथा आयमूलक तालिमहरू",
+   "en": "Skill and income-generation training",
+   "terms": "samuha, group, sipmulak, skill, aayamulak, income, vocational, livelihood, training"
+  },
+  {
+   "id": 50,
+   "ne": "बिपन्न, दलित र आदिवासी जनजातिका महिलालाई उनीहरुको चाहना बमोजिम सीपमूलक तालिम (बाखा पालन, मौरी पालन, उन्नत गाइ/भैसी पालन, वेमौसमी तरकारी",
+   "en": "Skills training for poor, Dalit and indigenous women",
+   "terms": "bipanna, poor, dalit, aadibasi, indigenous, sipmulak, skill, talim, training, bakhra, goat, mauri, bee, honey, bemausami, off, season, tarkari, vegetable, keeping, dairy, women, livelihood"
+  },
+  {
+   "id": 51,
+   "ne": "अभिलेख तथा तथ्याड्क व्यवस्थापन",
+   "en": "Record and data management",
+   "terms": "abhilekh, record, byabasthapan, management, data, records, documents, statistics"
+  },
+  {
+   "id": 52,
+   "ne": "सामुदायिक बनको जग्गामा बिपन्न बर्गका उपभोक्तालाई आयमूलक कार्यकरम",
+   "en": "Income programme for poor users on community forest land",
+   "terms": "samudayik, community, jagga, land, bipanna, poor, upabhokta, user, aayamulak, income, pro-poor, plot, households"
+  },
+  {
+   "id": 53,
+   "ne": "आयमूलक कार्यक्रम",
+   "en": "Income-generation programme",
+   "terms": "aayamulak, income, livelihood, poor"
+  },
+  {
+   "id": 54,
+   "ne": "पशुपालनका लागि घाँस खेती",
+   "en": "Fodder and grass cultivation for livestock",
+   "terms": "pasupalan, livestock, ghans, grass, fodder, kheti, farming, trees, napier"
+  },
+  {
+   "id": 55,
+   "ne": "पशुपालनका लागि अनुदान र पशुपालन",
+   "en": "Livestock grant and livestock keeping",
+   "terms": "pasupalan, livestock, anudan, grant, subsidy, animals, cattle, goats"
+  },
+  {
+   "id": 56,
+   "ne": "गोठ सुधार",
+   "en": "Livestock shed improvement",
+   "terms": "goth, shed, cattle, improved, barn"
+  },
+  {
+   "id": 57,
+   "ne": "गोठाला शिक्षा",
+   "en": "Herder education",
+   "terms": "gothala, herder, shiksha, education, shepherd, cowherd, children"
+  },
+  {
+   "id": 58,
+   "ne": "सामुदायिक बनमा कृषि बन",
+   "en": "Agroforestry in the community forest",
+   "terms": "samudayik, community, krishi, agriculture, van, ban, forest, jungle, agro, forestry, crops, under, trees"
+  },
+  {
+   "id": 59,
+   "ne": "अम्रिसो, दालचिनी, आदि नगदेवाली",
+   "en": "Cash crops (broom grass, cinnamon etc.)",
+   "terms": "amriso, cinnamon, dalchini, cash, crop, spice"
+  },
+  {
+   "id": 60,
+   "ne": "बाँस-निगालो वा बेत-बाँस आदि बाँसजन्य विरुबा रोपण र उत्पादन",
+   "en": "Bamboo, ringal and cane planting and production",
+   "terms": "baans, bamboo, nigalo, ringal, bet, cane, rattan, biruwa, seedling, plant, ropan, planting, utpadan, production, plantation"
+  },
+  {
+   "id": 61,
+   "ne": "बहुद्देश्यीय र बहुवर्षीय फलफूल खेती",
+   "en": "Multipurpose perennial fruit farming",
+   "terms": "phalphul, fruit, kheti, farming, orchard, trees, mango, lemon"
+  },
+  {
+   "id": 62,
+   "ne": "जडिबुटी नर्सरी निर्माण तथा बिरुवा उत्पादन",
+   "en": "Herb nursery and seedling production",
+   "terms": "jadibuti, herbs, medicinal, nursery, nurseri, narsari, nirman, construction, biruwa, seedling, plant, utpadan, production, seedlings"
+  },
+  {
+   "id": 63,
+   "ne": "तरकारी खेतीका लागि उत्पादनमूलक अनुदान",
+   "en": "Production grant for vegetable farming",
+   "terms": "tarkari, vegetable, anudan, grant, subsidy, farming"
+  },
+  {
+   "id": 64,
+   "ne": "निजी जग्गामा रैथाने वाली तथा खाद्य उत्पादनमा आधारित अनुदान",
+   "en": "Grant for native crops and food production on private land",
+   "terms": "niji, private, jagga, land, raithane, native, anudan, grant, subsidy, local, crops, food"
+  },
+  {
+   "id": 65,
+   "ne": "मौरी, रेशम, लाहा आदि पालनका लागि सहयोग तथा अनुदान",
+   "en": "Support and grants for bees, silk and lac keeping",
+   "terms": "mauri, bee, honey, resham, silk, laha, lac, sahayog, support, anudan, grant, subsidy, beekeeping, sericulture"
+  },
+  {
+   "id": 66,
+   "ne": "विपन्न वर्गका लागि आवाश योजना",
+   "en": "Housing scheme for the poor",
+   "terms": "bipanna, poor, aawas, housing, house, shelter, homes, households"
+  },
+  {
+   "id": 67,
+   "ne": "विपन्न बर्ग तथा जटिल रोग उपचारमा सहयोग",
+   "en": "Support for the poor and treatment of serious illness",
+   "terms": "bipanna, poor, rog, disease, illness, upachar, treatment, sahayog, support, medical, health"
+  },
+  {
+   "id": 68,
+   "ne": "जटिल रोग उपचारमा सहयोग",
+   "en": "Support for treatment of serious illness",
+   "terms": "rog, disease, illness, upachar, treatment, sahayog, support, medical, health"
+  },
+  {
+   "id": 69,
+   "ne": "जेष्ठ नागरीक सहयोग",
+   "en": "Support for senior citizens",
+   "terms": "jestha, elderly, senior, nagarik, citizen, sahayog, support, old, age, assistance"
+  },
+  {
+   "id": 70,
+   "ne": "खाद्यवस्तु: बेल, काफल, लालीगुँरास, ऐसेलु लगायतका जंगली फलफूलका जुस, लप्सी, अचार, मौरी पालन र मह उत्पादन, सिस्नोको पाउडर, आयुर्वेद जडीबुटी, आदि।",
+   "en": "Food products: wild-fruit juice, jam, pickle, honey, nettle powder, herbs",
+   "terms": "mauri, bee, honey, utpadan, production, jadibuti, herbs, medicinal, food, processing, juice, jam, pickle, enterprise"
+  },
+  {
+   "id": 71,
+   "ne": "कागजः लोक्ताबाट उत्पादित नेपाली कागज।",
+   "en": "Nepali paper from lokta",
+   "terms": "kagaj, paper, handmade, lokta, enterprise"
+  },
+  {
+   "id": 72,
+   "ne": "कपडाः जंगली अल्लोबाट उत्पादित कपडा तथा रेशम खेती।",
+   "en": "Cloth from wild nettle (allo) and silk farming",
+   "terms": "kapada, cloth, resham, silk, kheti, farming, textile, fibre, weaving, enterprise"
+  },
+  {
+   "id": 73,
+   "ne": "सुगन्धित तेल: विभिन्न किसिमका सुगन्धित वनस्पतिबाट उत्पादित तेल।",
+   "en": "Aromatic (essential) oil",
+   "terms": "tel, oil, essential, lemongrass, perfume, distillation, enterprise"
+  },
+  {
+   "id": 74,
+   "ne": "तेल तथा घ्यू उत्पादन: चिउरी, ढटेलो लगायत अन्य प्रजातिबाट घ्यू तथा तेल उत्पादन।",
+   "en": "Oil and ghee from chiuri, dhatelo and other species",
+   "terms": "tel, oil, ghiu, ghee, utpadan, production, anya, other, butter, tree, chiuri, enterprise"
+  },
+  {
+   "id": 75,
+   "ne": "जडिबुटी तथा गैरकाष्ठ वन पैदावार: खोटो, लाहा लगायत संभाव्य जडिबुटी तथा गैरकाष्ठ वन पैदावार संकलन केन्द्रको परिचालन।",
+   "en": "Herb and NTFP collection centre",
+   "terms": "jadibuti, herbs, medicinal, gairkasth, non, timber, ntfp, van, ban, forest, jungle, paidawar, product, laha, lac, sankalan, collection, centre, depot, khoto"
+  },
+  {
+   "id": 76,
+   "ne": "फर्निचर सःमील र हस्तकलाः फर्निचर, सःमील, काष्ठकला र हस्तकला उद्यम।",
+   "en": "Furniture, sawmill and handicraft enterprise",
+   "terms": "furniture, hastakala, handicraft, udyam, enterprise, carpentry, wood, craft, sawmill, timber, industry"
+  },
+  {
+   "id": 77,
+   "ne": "वेत वासबाट फर्निचर र हस्तकला बाँस, निगालाबाट उत्पादित चित्राहरु। वेतबाट उत्पादित र तयार गरिएका फर्निचर, सजाउने सामग्रीहरु, आदि।",
+   "en": "Cane and bamboo furniture and handicrafts",
+   "terms": "bet, cane, rattan, furniture, hastakala, handicraft, baans, bamboo, craft, enterprise"
+  },
+  {
+   "id": 78,
+   "ne": "डोरी उद्योग: बनकस, बाबियो लगायतबाट डोरी तथा नाम्लो दाम्लो उत्पादन।",
+   "en": "Rope industry",
+   "terms": "dori, rope, udyog, industry, utpadan, production, cord, babiyo, string, enterprise"
+  },
+  {
+   "id": 79,
+   "ne": "दुनाटपरी उद्योग: साल तथा अन्य प्रजातिका पातबाट दुनाटपरी उत्पादन।",
+   "en": "Leaf plate (duna-tapari) industry",
+   "terms": "duna, tapari, leaf, plate, udyog, industry, anya, other, utpadan, production, sal, plates, bowls, enterprise"
+  },
+  {
+   "id": 80,
+   "ne": "कृषि औजार: काठबाट निर्मित हलो, जुवा आदि।",
+   "en": "Wooden farm tools (plough, yoke)",
+   "terms": "krishi, agriculture, aujar, tools, agricultural, implements, enterprise"
+  },
+  {
+   "id": 81,
+   "ne": "नर्सरी व्यवस्थापनः विरुवा उत्पादन र वितरण।",
+   "en": "Nursery management: seedling production and distribution",
+   "terms": "nursery, nurseri, narsari, byabasthapan, management, biruwa, seedling, plant, utpadan, production, bitaran, distribution, enterprise, seedlings, sell"
+  },
+  {
+   "id": 82,
+   "ne": "पर्यापर्यटन: जैविक विविधतामा आधारित पदमार्ग, चरा अवलोकन, वन्यजन्तु अवलोकन, दृष्यावलोकन, जलयात्रा, सिमसार अवलोकन, आदि।",
+   "en": "Eco-tourism: nature trails, bird and wildlife watching, viewpoints, boating",
+   "terms": "paryapariyatan, ecotourism, tourism, jaibik, biological, padmarga, trail, simsar, wetland, nature, bird, watching"
+  },
+  {
+   "id": 83,
+   "ne": "सामुदायिक वनभित्र वा आसपासका ऐतिहासिक, धार्मिक र पुरातात्त्विक महत्त्वका मठ, मन्दिर, चैत्य, गुम्बा, गढी, गुफा, झरना, सिमसार लगायतका सम्पदाको संरक्षण, व्यवस्थापन र विकासमा टेवा पुग्ने गरी अवलोकन भ्रमण, पदयात्रा, वन विहार, पौडी पोखरी, जलविहार जस्ता कार्य सज्चालन गर्न,",
+   "en": "Heritage sites: visits, trekking, forest walk, swimming and boating",
+   "terms": "samudayik, community, simsar, wetland, sanrakshan, conservation, protection, byabasthapan, management, bhraman, tour, travel, van, ban, forest, jungle, pokhari, pond, temple, monastery, cave, waterfall, pilgrimage, heritage, tourism"
+  },
+  {
+   "id": 84,
+   "ne": "प्राकृतिक सौन्दर्य, भू-दृष्य तथा वन्यजन्तु अवलोकनको लागि मचान वा स्पट निर्माण र सञ्चालन,",
+   "en": "Viewing tower or viewpoint construction and operation",
+   "terms": "machan, tower, nirman, construction, watch, viewpoint, scenery, wildlife, viewing"
+  },
+  {
+   "id": 85,
+   "ne": "वनमा पाइने काष्ठ, गैहकाष्ठ वनस्पति प्रजाति र वन्यजन्तु लगायत जैविक विविधता संरक्षण सम्बन्धी सूचना केन्द्र स्थापना र सञ्चालन,",
+   "en": "Biodiversity information centre",
+   "terms": "jaibik, biological, sanrakshan, conservation, protection, visitor, centre, museum, information"
+  },
+  {
+   "id": 86,
+   "ne": "असहाय, घाइते, मुद्दाको रोहमा प्राप्त भएका, तथा उद्दार गरिएका वन्यजन्तु पालन तथा व्यवस्थापन र वन्यजन्तु संरक्षण संचालन",
+   "en": "Care of rescued and injured wildlife",
+   "terms": "byabasthapan, management, sanrakshan, conservation, protection, wildlife, rescue, centre, animals"
+  },
+  {
+   "id": 87,
+   "ne": "जङ्गली पुष्प बगैंचा, विभिन्न प्रजातिका बिरुवा रोपण, वनजन्य फलफूल खेती, जैविक विविधता पार्क, इको बाल उद्यान अदि निर्माण र संचालन",
+   "en": "Wild flower garden, forest fruit, biodiversity park and eco children's park",
+   "terms": "bagaincha, garden, biruwa, seedling, plant, ropan, planting, phalphul, fruit, kheti, farming, jaibik, biological, udyan, park, nirman, construction, botanical, flowers"
+  },
+  {
+   "id": 88,
+   "ne": "न्यूनतम क्षेत्रफल ओगट्ने गरी रोपकोर्स जिपकोष्टर, बज्जीजम्प, चिल्ड्रेन पार्क, पिकनिक स्पट चमेनागृह, अतिथिगृह, पार्किङ्ग, मन्दिर, गुम्बा आदिमा प्रवेश गर्ने प्रवेशद्वार, शौचालय, रेष्टुरेण्ट, गिफ्ट सप, चौकिदार तथा टिकट घर आदि निर्माण गर्न,",
+   "en": "Tourist facilities: rope course, zip flyer, bungee, picnic spot, gate, toilet, restaurant",
+   "terms": "nirman, construction, adventure, park, zipline, children, guest, house, parking, ticket"
+  },
+  {
+   "id": 89,
+   "ne": "बाँस, बेत, खरखडाई, ढुङ्गा जस्ता स्थानीय सामग्री र प्रविधि प्रयोग गरी स्वीकृत कार्ययोजनाले तोकेको स्थानमा कटेज, प्रतिक्षालय, गोलघर, आराम स्थल, अस्थायी पसल तथा रेष्टुरेण्ट निर्माण गरी सञ्चालन गर्न,",
+   "en": "Cottages and rest places from local materials",
+   "terms": "baans, bamboo, bet, cane, rattan, nirman, construction, huts, shelter, round, house, shop, restaurant, tourism"
+  },
+  {
+   "id": 90,
+   "ne": "ढुङ्गा माटोको गोरेटो, पदमार्ग, हाईकिङ्ग रुट, वाकिङ्ग रुट, साइक्लिङ्ग रुट, आराम बेञ्च तथा कुर्चि, डस्ट बिन, इको गार्डेन, दुबोको हरियाली चौर, गल्फ कोर्ष, टेनिस कोर्ट; ब्याडमिन्टन कोर्ट, फुटबल तथा भलिबल ग्राउण्ड, मनोरञ्जन डबली, टेण्टेड क्याम्प, पिकनिक स्पटको व्यवस्थापन गर्न,",
+   "en": "Trails, hiking and cycling routes, benches, camps and sports grounds",
+   "terms": "goreto, trail, footpath, padmarga, byabasthapan, management, walking, path, trekking, route, cycle, sports, ground, picnic"
+  },
+  {
+   "id": 91,
+   "ne": "प्यारा ग्लाईडिङ्ग, हात्ती सफारी, हर्स राइडिङ्ग, वर्ड वाचिङ्ग, फिसिड, साइक्लिङ्ग, क्यानोपीवाक, फोटो टुर व्यवस्थापन गर्न,",
+   "en": "Paragliding, elephant safari, horse riding, bird watching, canopy walk",
+   "terms": "byabasthapan, management, adventure, activities, safari, fishing, photography, tour"
+  },
+  {
+   "id": 92,
+   "ne": "फेन्सिङ्ग, तारबार वा जाली, पर्खाल आदिको माध्यमले क्षेत्र सुरक्षा गर्न।",
+   "en": "Fencing, wire mesh or wall to protect an area",
+   "terms": "tarbar, fence, fencing, wall, boundary, protection"
+  },
+  {
+   "id": 93,
+   "ne": "जलबायु परिबर्तन अनुकूलन तथा विपद जोखिम व्यवस्थापन सम्बन्धी सचेतना",
+   "en": "Climate change adaptation and disaster-risk awareness",
+   "terms": "jalabayu, climate, bipad, disaster, jokhim, risk, byabasthapan, management, sachetana, awareness, training"
+  },
+  {
+   "id": 94,
+   "ne": "पानीको मुहान र स्रोत संरक्षण",
+   "en": "Water source (spring) protection",
+   "terms": "pani, water, muhan, spring, source, sanrakshan, conservation, protection, catchment, protect, mul"
+  },
+  {
+   "id": 95,
+   "ne": "सिमसार तथा जलाशय क्षेत्रहरूको संरक्षण",
+   "en": "Wetland and reservoir protection",
+   "terms": "simsar, wetland, sanrakshan, conservation, protection, pond, lake, protect"
+  },
+  {
+   "id": 96,
+   "ne": "वन क्षेत्रको भू-उपयोगको अवस्था (घाँसे मैदान, घना वन, झाडी, खुल्ला चौर, जलस्रोत, आदि)",
+   "en": "Land-use survey of the forest area",
+   "terms": "van, ban, forest, jungle, jhadi, bush, shrub, land, use, grassland, dense, survey"
+  },
+  {
+   "id": 97,
+   "ne": "प्रकोप जोखिम/प्रभावित क्षेत्रहरुको संरक्षण",
+   "en": "Protecting hazard-prone and affected areas",
+   "terms": "prakop, disaster, jokhim, risk, sanrakshan, conservation, protection, landslide, erosion, gully, slope, protect"
+  },
+  {
+   "id": 98,
+   "ne": "आगलागी हुने सम्भावित क्षेत्रमा अग्नि नियन्त्रण रेखा तथा अग्नि पथको निर्माण र मर्मत सम्भार",
+   "en": "Fire line and fire path in fire-prone areas",
+   "terms": "aagalagi, fire, agni, niyantran, control, nirman, construction, marmat, repair, break, firebreak, fireline"
+  },
+  {
+   "id": 99,
+   "ne": "मिचाहा प्रजाति नियन्त्रण तथा व्यवस्थापन कार्यक्रम",
+   "en": "Invasive species control and management",
+   "terms": "michaha, invasive, niyantran, control, byabasthapan, management, weeds, banmara, lantana, mikania"
+  },
+  {
+   "id": 100,
+   "ne": "संरक्षण तथा जल पुनर्भरण पोखरी निर्माण",
+   "en": "Conservation and water-recharge pond construction",
+   "terms": "sanrakshan, conservation, protection, pokhari, pond, nirman, construction, recharge, water, harvesting, tank"
+  },
+  {
+   "id": 101,
+   "ne": "खडेरी सहन गर्न सक्ने प्रजातिहरुको वृक्षारोपण",
+   "en": "Planting drought-tolerant species",
+   "terms": "khaderi, drought, brikshyaropan, brikshaaropan, planting, resistant, trees, dry"
+  },
+  {
+   "id": 102,
+   "ne": "कार्यसमितिको बैठक",
+   "en": "Executive committee meeting",
+   "terms": "karyasamiti, committee, baithak, meeting, board"
+  },
+  {
+   "id": 103,
+   "ne": "समूहको साधारण सभा",
+   "en": "General assembly of the group",
+   "terms": "samuha, group, sadharan, general, sabha, assembly, annual, meeting, members"
+  },
+  {
+   "id": 104,
+   "ne": "सार्वजनिक सुनुबाई",
+   "en": "Public hearing",
+   "terms": "sunuwai, hearing, public, audit, accountability"
+  },
+  {
+   "id": 105,
+   "ne": "योजना तर्जुमा गोष्ठी",
+   "en": "Planning workshop",
+   "terms": "goshthi, meeting, seminar, plan, preparation, workshop"
+  },
+  {
+   "id": 106,
+   "ne": "प्रगति समिक्षा बैठक",
+   "en": "Progress review meeting",
+   "terms": "pragati, progress, samiksha, review, baithak, meeting, report"
+  },
+  {
+   "id": 107,
+   "ne": "स्थानीय तहका पदाधिकारी तथा नागरीक समाज र संघ महासंघका प्रतिनिधिसँग सामुदायिक वन समन्वय गोष्ठी",
+   "en": "Coordination meeting with local government, civil society and federation",
+   "terms": "nagarik, citizen, samudayik, community, van, ban, forest, jungle, goshthi, meeting, seminar, coordination, federation, fecofun, municipality, ward"
+  },
+  {
+   "id": 108,
+   "ne": "समूहको विधान संशोधन",
+   "en": "Group constitution amendment",
+   "terms": "samuha, group, bidhan, constitution, sansodhan, amendment, revision, rules, amend, change, statute"
+  },
+  {
+   "id": 109,
+   "ne": "सामुदायिक बनको अनुगमन",
+   "en": "Community forest monitoring",
+   "terms": "samudayik, community, anugaman, monitoring, follow, up, check"
+  },
+  {
+   "id": 110,
+   "ne": "वार्षिक प्रतिवेदन पुस्तिका लगायत प्रचार-प्रसार सामाग्री प्रकाशन तथा वितरण",
+   "en": "Annual report booklet and publicity materials",
+   "terms": "pratibedan, report, bitaran, distribution, print, publish, distribute, booklet, publicity"
+  },
+  {
+   "id": 111,
+   "ne": "समूहको विधान संशोधन",
+   "en": "Group constitution amendment",
+   "terms": "samuha, group, bidhan, constitution, sansodhan, amendment, revision, rules, amend, change, statute"
+  },
+  {
+   "id": 112,
+   "ne": "सामुदायिक बनको अनुगमन तथा मूल्याड्डन",
+   "en": "Monitoring and evaluation",
+   "terms": "samudayik, community, anugaman, monitoring, mulyankan, evaluation, m&e, review"
+  },
+  {
+   "id": 113,
+   "ne": "विभिन्न दिवस तथा समारोह मनाउने (सामुदायिक बन, दिवस वृक्षारोपण दिववस, वातावरण दिवस, वन महोत्सव, जैविक विविधता दिवस, अन्तराष्ट्रिय पर्वतीय दिवस, सिमसार दिवस, आदि।",
+   "en": "Celebrating special days (forest day, tree planting day, environment day, forest festival)",
+   "terms": "diwas, day, samudayik, community, van, ban, forest, jungle, brikshyaropan, brikshaaropan, planting, jaibik, biological, simsar, wetland, observance, festival, celebrations"
+  },
+  {
+   "id": 114,
+   "ne": "उत्कृष्ट कार्य गर्ने समूहका सदस्यको मूल्याङ्ककन तथा पुरस्कार",
+   "en": "Evaluation and awards for outstanding group members",
+   "terms": "puraskar, award, prize, reward, best, performing"
+  },
+  {
+   "id": 115,
+   "ne": "मर्मत/सम्भार",
+   "en": "Office building repair and maintenance",
+   "terms": "marmat, repair, office, building, maintain"
+  },
+  {
+   "id": 116,
+   "ne": "निर्माण",
+   "en": "Office building construction",
+   "terms": "nirman, construction, build, new, office, building"
+  },
+  {
+   "id": 117,
+   "ne": "फर्निचरको व्यवस्था",
+   "en": "Office furniture",
+   "terms": "chairs, tables, desks, furniture"
+  },
+  {
+   "id": 118,
+   "ne": "कार्यालय समान",
+   "en": "Office equipment",
+   "terms": "karyalaya, office, saman, goods, equipment, computer, printer, supplies"
+  },
+  {
+   "id": 119,
+   "ne": "अन्य",
+   "en": "Other office building costs",
+   "terms": "anya, other, miscellaneous"
+  },
+  {
+   "id": 120,
+   "ne": "इलेक्ट्रिक चुल्हो, उन्नत चुल्हो, वितरण वा गोबरग्यांस प्लान्ट स्थापना, आदिका लागि अनुदान",
+   "en": "Grants for electric / improved cooking stoves and biogas plants",
+   "terms": "chulho, stove, bitaran, distribution, gobargas, biogas, anudan, grant, subsidy, cooking, gas, clean, energy"
+  },
+  {
+   "id": 121,
+   "ne": "महिला साक्षरता कार्यक्रम",
+   "en": "Women's literacy programme",
+   "terms": "mahila, women, saksharta, literacy, reading, writing, class, adult, education"
+  },
+  {
+   "id": 122,
+   "ne": "मौरीघार अनुदान",
+   "en": "Beehive grant",
+   "terms": "maurighar, beehive, anudan, grant, subsidy, bee, hive, box, honey"
+  },
+  {
+   "id": 123,
+   "ne": "उन्नत जातका पशुपालकलाई पुरस्कार स्वरूप अनुदान",
+   "en": "Award grant for keepers of improved livestock breeds",
+   "terms": "puraskar, award, anudan, grant, subsidy, improved, breed, animals, reward"
+  },
+  {
+   "id": 124,
+   "ne": "बाखा साटासाट कार्यक्रम",
+   "en": "Goat exchange programme",
+   "terms": "bakhra, goat, swap, bank"
+  },
+  {
+   "id": 125,
+   "ne": "बेमौसमी तरकारी खेती",
+   "en": "Off-season vegetable farming",
+   "terms": "bemausami, off, season, tarkari, vegetable, kheti, farming, vegetables, tunnel, greenhouse"
+  },
+  {
+   "id": 126,
+   "ne": "गोरेटो बाटो सुधार",
+   "en": "Footpath improvement",
+   "terms": "goreto, trail, footpath, path, walking, track, repair"
+  },
+  {
+   "id": 127,
+   "ne": "सानास्तरका सामुदायिक पुल/कल्भर्ट निर्माण",
+   "en": "Small community bridges and culverts",
+   "terms": "samudayik, community, pul, bridge, culvert, nirman, construction, crossing, stream"
+  },
+  {
+   "id": 128,
+   "ne": "विद्यालय भवन मर्मत",
+   "en": "School building repair",
+   "terms": "bidyalaya, school, bhawan, building, marmat, repair, classroom"
+  },
+  {
+   "id": 129,
+   "ne": "विद्यालय संचालन अनुदान",
+   "en": "School running grant",
+   "terms": "bidyalaya, school, anudan, grant, subsidy, operation, support, teacher, salary"
+  },
+  {
+   "id": 130,
+   "ne": "जेहेन्दार विद्यार्थी छात्रवृत्ति",
+   "en": "Scholarship for bright students",
+   "terms": "bidyarthi, student, chhatrabritti, scholarship, students, education, fund"
+  },
+  {
+   "id": 131,
+   "ne": "साना खानेपानी तथा सिंचाईकुलो निर्माण र मर्मत सम्भार",
+   "en": "Small drinking-water and irrigation canal construction and maintenance",
+   "terms": "khanepani, drinking, water, sinchai, kulo, irrigation, canal, nirman, construction, marmat, repair, supply, tap"
+  },
+  {
+   "id": 132,
+   "ne": "अन्य",
+   "en": "Other community development",
+   "terms": "anya, other, miscellaneous"
+  },
+  {
+   "id": 133,
+   "ne": "तलव",
+   "en": "Salary",
+   "terms": "talab, salary, staff, pay, wages"
+  },
+  {
+   "id": 134,
+   "ne": "मसलन्द",
+   "en": "Stationery",
+   "terms": "maslanda, stationery, office, supplies, paper, pen"
+  },
+  {
+   "id": 135,
+   "ne": "भ्रमण भत्ता",
+   "en": "Travel allowance",
+   "terms": "bhraman, tour, travel, bhatta, allowance, tada, daily, transport"
+  }
+ ]
+}

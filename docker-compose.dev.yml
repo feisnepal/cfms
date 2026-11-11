@@ -1,0 +1,49 @@
+# Development overrides (H1.3 / S1-25).
+#
+#     docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# docker-compose.yml is the deployable baseline; everything that is convenient
+# in development and unsafe in production lives here instead. That split exists
+# because the base file previously shipped DEBUG=true — and DEBUG in this app
+# disables HSTS and CSP, echoes SQL, returns exception detail and type to
+# clients, binds uvicorn to 0.0.0.0, and enables the /auth/toggle-role
+# privilege-escalation endpoint (report S2-06).
+#
+# Flipping the base file to DEBUG=false is task 2.6, deliberately left there so
+# the change lands with the endpoint deletion and the production-mode startup
+# assertion rather than on its own.
+
+services:
+  backend:
+    environment:
+      DEBUG: "true"
+      LOG_FORMAT: text
+    # Reload on source changes. Not in the base file: --reload runs a file
+    # watcher and forks a supervisor, neither of which belongs in production.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
+      - ./exports:/app/exports
+
+  calculation_worker:
+    environment:
+      DEBUG: "true"
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    # Stop at the Dockerfile's node stage. The base image finishes at
+    # an nginx image serving a built bundle — which has no node, so a Vite
+    # dev server cannot run there. Targeting `build` gives the node stage, and
+    # port 3000 replaces the base file's 3001:80.
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: build
+    command: npm run dev -- --host 0.0.0.0 --port 3000
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules

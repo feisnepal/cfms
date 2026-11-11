@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-08-04T00:00:00.000Z",
+  "baseUrl": "http://localhost:4173",
+  "metrics": {
+    "largest-contentful-paint": 2500,
+    "first-contentful-paint": 1800,
+    "total-blocking-time": 200,
+    "cumulative-layout-shift": 0.1,
+    "speed-index": 3400,
+    "interactive": 3800,
+    "performance-score": 90
+  }
+}

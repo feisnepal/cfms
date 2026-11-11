@@ -1,0 +1,377 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables (never commit secrets)
+.env
+.env.local
+.env.development
+token.txt
+
+# Database
+*.db
+*.sqlite
+
+# Archives
+*.rar
+*.zip
+
+# Large data files (GIS, exports, uploads, backups)
+uploads/
+exports/
+backups/
+testData/
+*.tif
+*.tiff
+*.gpkg
+*.csv
+*.xlsx
+dump.rdb
+*.dump
+PostgreSQL8292026_Backups/
+coverage.xml
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/node_modules/
+node_modules/
+
+# Cache & temp
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Vitest --coverage output. CI publishes it as an artifact; it has no business
+# in the repository, and it appeared as 700+ untracked files the first time the
+# coverage run happened locally.
+frontend/coverage/
+frontend/.vite/
+frontend/.lighthouseci/
+frontend/playwright-report/
+frontend/test-results/
+.lighthouseci/
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local environment
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+.env.development
+
+# Distribution
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+*.backup
+*.bak
+
+# Batch files (keep only system ones)
+*.bat
+!start_all.bat
+!stop_all.bat
+!restart_all.bat
+
+# Temporary Python scripts (generated)
+add_*.py
+check_*.py
+create_*.py
+diagnose_*.py
+fix_*.py
+implement_*.py
+install_*.py
+optimize_*.py
+quick_*.py
+reanalyze_*.py
+run_*.py
+test_*.py
+update_*.py
+verify_*.py
+apply_*.py
+assign_*.py
+compare_*.py
+complete_*.py
+export_*.py
+extract_*.py
+generate_*.py
+get_*.py
+insert_*.py
+wait_*.py
+SAFETY_*.py
+
+# ...but the scripts directories hold maintained tooling, not throwaways. Those
+# patterns are unanchored, so `check_*.py` silently swallowed
+# scripts/check_schema_drift.py (task H1.11). Negations must follow the patterns
+# they override — last match wins.
+#
+# H5.7: the negation covered backend/scripts/ only, so the SAME trap caught
+# scripts/check_slo.py at the root. Both are un-ignored now.
+!backend/scripts/**
+!scripts/**
+# ...and the same trap pointing the other way: `**` un-ignores EVERYTHING under
+# those directories, including the caches the global `__pycache__/` rule at the
+# top was already handling. Found 2026-08-25, when backend/scripts/__pycache__/
+# showed up as untracked next to the H3.4 gates. Same shape as the
+# backend/tests/ block below, which got this right first.
+backend/scripts/**/__pycache__/
+backend/scripts/**/*.py[cod]
+scripts/**/__pycache__/
+scripts/**/*.py[cod]
+
+# Backend test suite is VERSIONED (undo gates, regressions) — the temp-script
+# `test_*.py` rules above must never swallow it. Only caches stay ignored.
+# The application package is SOURCE. The throwaway-script patterns above are
+# unanchored, so `export_*.py` silently took app/services/export_cleanup.py —
+# a real 7.8KB module the startup path imports. It has never been in the
+# repository, so every deploy ran without it and swallowed the ImportError as
+# "Startup export cleanup failed (non-critical)": temp exports were never
+# cleaned up anywhere but this machine. Caches under app/uploads/ stay ignored.
+!backend/app/**
+backend/app/uploads/
+backend/app/**/__pycache__/
+backend/app/**/*.py[cod]
+
+!backend/tests/**
+backend/tests/**/__pycache__/
+backend/tests/**/*.py[cod]
+backend/tests/**/.pytest_cache/
+
+# Research & temp docs (keep only versioned docs in map_design_ui_impl/ and runbooks/)
+Research/
+Tab_setup/
+docs/
+map_test_discussion*.md
+map_designing_UI_report.md
+e2e_failed.md
+login.json
+nul
+forest_management*.rar
+canopy_height5m.tif
+canopy_height5m.tif.aux.xml
+canopy_validation/
+dump.rdb
+
+# Debug / one-off junk at repo root
+/100000
+/_dbg_out.txt
+/prompt_for_merge.md
+/# Machine-local session logs / QA scratch docs (deliberately untracked)
+/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*.txt
+/TEMPLATE_SYSTEM_TUTORIAL.md
+/WORKSPACE_LAYER_STYLING_QA.md
+/test_output.txt
+/frontend/test_output.txt
+/snapshots/
+
+# Local junk
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!tsconfig.*.json
+!frontend/src/i18n/locales/en.json
+!frontend/src/i18n/locales/ne.json
+# reviewer notes for the Translation page (key -> where the sentence appears), read by translation_service
+!translations/*_context.json
+# English names + search words for the activity master list, read by scripts/seed_activity_search_terms.py
+!backend/data/activity_search_terms.json
+# H2.12: the supply-chain baselines are the gate. A blanket `*.json` above had
+# already swallowed five files once (recovered in b7bf97d); a silently ignored
+# baseline would instead make CI fail on every finding as though it were new.
+!security/*.json
+
+# ...and these are source too. The blanket `*.json` above is unanchored, so it
+# matches every directory and silently swallows real config — `git add` reports
+# nothing when it skips an ignored file. Already lost to it: the Sentry alert
+# rules and dashboard, the Grafana dashboard, and .devcontainer/devcontainer.json,
+# which a commit message claimed to add and did not. Anchoring the blanket to the
+# repo root is NOT the fix: 4,049 of the untracked JSON files are backend caches
+# (.mypy_cache, .pytest_cache, .ruff_cache) that should stay ignored.
+!.devcontainer/*.json
+!sentry/*.json
+!load-tests/grafana-dashboards/*.json
+!load-tests/grafana-datasources/*.json
+!frontend/tsc-baseline.json
+# H4.1: the three lint ratchets, for the same reason as tsc-baseline above.
+# A silently ignored baseline is worse than none — CI would treat all 680
+# known findings as new and go red on the first push. Fourth instance of
+# this trap; each one was found by checking `git check-ignore` before the
+# commit rather than after.
+!backend/ruff-baseline.json
+!backend/black-baseline.json
+!frontend/eslint-baseline.json
+# ...and the response-model gate's baseline (H4.8 / S3-47). SIXTH instance
+# of this trap. A baseline that is green locally and ignored by git is a
+# ratchet that only ever ratchets the author's machine.
+!backend/response-model-baseline.json
+!backend/scripts/unit_access_baseline.json
+# ...and the security-rules gate's baseline (H4.6 / S2-42 / S3-09). SEVENTH
+# instance of the same trap. Without the exception, CI would treat all 733
+# known violations as new on the first push and go red.
+!frontend/security-rules-baseline.json
+# ...and the any-count gate's baseline (H4.5 / S2-24). EIGHTH instance of the
+# same trap. Without it, the `: any` ratchet would be green locally, ignored
+# by git, and red on the first push.
+!frontend/any-count-baseline.json
+# ...and the perf gate's baseline, swallowed by the same rule. FIFTH
+# instance. CI's `npm run perf:validate` failed with "Missing baseline"
+# while it passed locally, because the file exists here and was never
+# published. That is the whole failure mode of this trap: a gate that is
+# green on the machine that wrote it and red everywhere else.
+!frontend/.lighthouse-baseline.json
+# Test fixtures are source, not build output.  The blanket `*.json` above was
+# silently swallowing them: `git add <dir>` skips ignored files WITHOUT an
+# error, so committed test files referenced fixtures that were never in the
+# repo and would fail on a fresh clone.
+!tests/fixtures/*.json
+!**/__tests__/fixtures/*.json
+# The DBH class-key contract artefact, and it needs its own line: the two above
+# do not cover it. A pattern containing a slash is anchored to this file's own
+# directory, so `tests/fixtures/*.json` means `<root>/tests/fixtures/` and not
+# `backend/tests/fixtures/`; only the `**/` prefix on the second one reaches
+# anywhere. It is a fixture by the definition given above -- the database holds
+# the keys and bounds, this file lets the frontend's label join see them, and
+# `backend/tests/test_dbh_class_keys_fixture.py` holds it to the live table. Left
+# uncommitted it would fail on a fresh clone in exactly the way the comment
+# above warns about, and silently, because `git add` skips ignored files.
+!backend/tests/fixtures/*.json
+!.pre-commit-config.yaml
+!.secrets.baseline
+!Makefile
+!docker-compose.yml
+!docker-compose.*.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend specific
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/node_modules/
+frontend/playwright-report/
+frontend/test-results/
+frontend/.lighthouseci/
+frontend/frontend/
+frontend/test-results-trace/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+
+# Secrets
+.secrets.baseline
+*.pem
+*.key
+*.crt
+# Scratch documents that live only on one machine, deliberately untracked.
+# Not junk to delete — just not repository history. `industry_grade_report_review.md`
+# IS tracked; these two are not.
+/ajeeb-session-ses_ff20.md
+/map_design_ui_impl/hardening_Discussion_very_large.md
+
+# Local pytest capture, never committed.
+/backend/.pytest-full.log
+
+# Stray root-level npm noise (a minimal package.json with only a typescript
+# dep; the real manifests live in frontend/). The blanket `*.json` +
+# `!package.json` / `!package-lock.json` negations earlier in this file would
+# otherwise re-include them, so these anchored ignores MUST stay after those
+# negations — last match wins.
+/package.json
+/package-lock.json
+
+# ===== september_enjoy export rules (2026-09-17) =====
+# The new public repo is code-first. Markdown is ignored EXCEPT operational
+# core (AGENTS/CLAUDE/CURRENT_PLAN/README/CHANGELOG) and the four guide files
+# under frontend/public/guides/ that GuideModal.tsx fetches at runtime.
+*.md
+!/AGENTS.md
+!/CLAUDE.md
+!/CURRENT_PLAN.md
+!/README.md
+!/CHANGELOG.md
+!frontend/public/guides/*.md
+# NOTE (2026-09-30): the Raster Sources plan/tracker/report were briefly
+# un-ignored here so they would get version history, then reverted before the
+# push. Reason: `origin` is a **public** repo and this file's policy above is
+# deliberately code-first. The plan, tracker and report are the owner's internal
+# working memory — 44 revisions of decisions, audit findings and incident records
+# — and are not for publication. They stay local; `AGENTS.md` and
+# `CURRENT_PLAN.md` carry the Session brief that points at them, which works on
+# this machine. Consequence accepted: a fresh *clone* gets dangling links to
+# those three files.
+
+# Transient backend log the owner drops in the repo root when something breaks
+# (2026-09-30). It is a symptom dump, not source, and it would otherwise be
+# committed alongside the fix it describes.
+/Backend_error.txt
+
+# Images are ignored entirely, EXCEPT frontend/public/cfms-logo.png (favicon
+# in index.html + Login/Layout header branding).
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.bmp
+*.ico
+!frontend/public/cfms-logo.png
+
+# Local design mock-ups for plan files (working memory, like the *.md plan files)
+/FOREST_SUMMARY_PANEL_MOCKUP.html
+
+# fixed pictures an OP template places with {{asset:name}} (RAMBHADEVI_SFM_RENEW_TEMPLATE_PLAN.md)
+!backend/app/assets/op_images/*.png
+
+# API key scratch file (never commit)
+/gemini_api_key_free_tier.txt
+
+# Kept out of the public repo
+/backend/redis-bin/
+/CLAUDE.md
+/AGENTS.md

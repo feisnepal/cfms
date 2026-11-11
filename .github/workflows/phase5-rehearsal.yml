@@ -1,0 +1,160 @@
+name: Phase 5 rehearsal
+
+# Phase 5's deploy pipeline (H5.2 · S2-28) is written but has never run, and
+# no VPS exists to run it against. This job is the deterministic proof — the
+# runbook's CI half (runbooks/RUNBOOK-PROVISION-STAGING.md §3): it builds the
+# two production images, starts the EXACT production compose file, migrates it,
+# proves a backup restores into a scratch database, then smokes the served stack
+# with the same gate R-3 uses in deploy.yml. A green run makes 5.1–5.4 (and
+# procedure 5.2) no longer documents; it is the rehearsal for the real deploy.
+#
+# Differences from deploy.yml, and why they are deliberate:
+#   · run locally on a throwaway GitHub-hosted runner, not over SSH
+#   · images are built, not pulled from a registry (REGISTRY=rehearsal)
+#   · R-1 (backup gate) runs AFTER migrations here, so a seeded row proves the
+#     restore against real data — the pipeline runs it BEFORE migrate to protect
+#     an existing production database, which on a first deploy would be empty.
+#   · the restore gate counts `translations` (present on a fresh stack) instead
+#     of `calculations` (which needs application data to be interesting).
+# Every stack it creates is torn down with `down -v`.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 5 * * 1" # weekly, Monday
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase5-rehearsal
+  cancel-in-progress: true
+
+env:
+  # Throwaway values for a stack this job creates and destroys. The prod compose
+  # interpolates these; never point this job at anything real.
+  REGISTRY: rehearsal
+  IMAGE_TAG: ${{ github.sha }}
+  POSTGRES_PASSWORD: rehearsal-ci-postgres-password
+  SECRET_KEY: phase5-rehearsal-ci-secret-key-0000000000
+  METRICS_TOKEN: rehearsal-ci-metrics-token
+
+jobs:
+  rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── 5.1 · build the two production images ────────────────────────────
+      - name: Build backend image (production Dockerfile)
+        run: |
+          docker build --progress=plain -t "${REGISTRY}/cf-backend:${IMAGE_TAG}" backend 2>&1 \
+            | tee /tmp/backend-build.log
+          exit ${PIPESTATUS[0]}
+      - name: Build frontend image (production Dockerfile)
+        run: |
+          docker build --progress=plain -t "${REGISTRY}/cf-frontend:${IMAGE_TAG}" frontend 2>&1 \
+            | tee /tmp/frontend-build.log
+          exit ${PIPESTATUS[0]}
+      - name: Confirm both images exist locally
+        run: |
+          found=$(docker images --format "{{.Repository}}:{{.Tag}}" \
+            | grep -cE "^rehearsal/cf-(backend|frontend):${IMAGE_TAG}$" || true)
+          echo "found $found of 2 expected images"
+          test "$found" -eq 2
+
+      # ── R-2 · migrate the production compose stack ───────────────────────
+      # `--wait` makes the HEALTHCHECKs load-bearing exactly as in deploy.yml.
+      - name: Start the production compose stack (up -d --wait)
+        run: |
+          docker compose -f deploy/docker-compose.prod.yml up -d --wait --wait-timeout 180 --remove-orphans
+          docker compose -f deploy/docker-compose.prod.yml ps
+      - name: Alembic upgrade head (R-2, inside the stack network)
+        id: migrate
+        run: |
+          docker compose -f deploy/docker-compose.prod.yml run --rm --no-deps -T backend alembic upgrade head
+          rev="$(docker compose -f deploy/docker-compose.prod.yml run --rm --no-deps -T backend alembic current 2>/dev/null | tail -1 | awk '{print $1}')"
+          echo "revision=$rev" >> "$GITHUB_OUTPUT"
+          echo "database is at: $rev"
+
+      # ── R-1 · back up, then prove the backup restores (5.3 / 5.4) ───────
+      - name: Seed a row so the restore gate compares real data
+        run: |
+          docker compose -f deploy/docker-compose.prod.yml exec -T db \
+            psql -U postgres -d cf_db -v ON_ERROR_STOP=1 -c \
+            "INSERT INTO public.translations (key, en, ne) VALUES \
+             ('rehearsal.seed.marker', 'rehearsal seed', 'rehearsal seed') \
+             ON CONFLICT (key) DO NOTHING"
+          docker compose -f deploy/docker-compose.prod.yml exec -T db \
+            psql -U postgres -d cf_db -tAc "select count(*) from public.translations"
+      - name: R-1 · dump + restore into a scratch DB and compare row counts
+        run: |
+          set -euo pipefail
+          CF="docker compose -f deploy/docker-compose.prod.yml"
+          mkdir -p /tmp/rehearsal-backups
+          stamp="$(date +%Y%m%d-%H%M%S)"
+          $CF exec -T db pg_dump -U postgres -d cf_db --format=custom --compress=6 \
+            > "/tmp/rehearsal-backups/cf_db_${stamp}.dump"
+          size=$(stat -c%s "/tmp/rehearsal-backups/cf_db_${stamp}.dump")
+          echo "dump: /tmp/rehearsal-backups/cf_db_${stamp}.dump (${size} bytes)"
+          # A rehearsal stack is fresh, so its dump is far smaller than a real
+          # deployment's. The threshold's job is to catch a dump that wrote
+          # nothing at all (an unreachable DB gives an empty file cleanly when
+          # the gate is loose enough to eat it).
+          [ "$size" -gt 100000 ] || { echo "dump implausibly small — refusing"; exit 1; }
+
+          $CF exec -T db psql -U postgres -c 'DROP DATABASE IF EXISTS cf_db_verify'
+          $CF exec -T db createdb -U postgres cf_db_verify
+          $CF exec -T db psql -U postgres -d cf_db_verify -c 'CREATE EXTENSION postgis'
+          $CF exec -T -e PGPASSWORD= db pg_restore -U postgres -d cf_db_verify \
+            --no-owner --no-privileges "/dev/stdin" < "/tmp/rehearsal-backups/cf_db_${stamp}.dump" || true
+
+          live="$( $CF exec -T db psql -U postgres -d cf_db -tAc 'select count(*) from public.translations')"
+          copy="$( $CF exec -T db psql -U postgres -d cf_db_verify -tAc 'select count(*) from public.translations')"
+          $CF exec -T db psql -U postgres -c 'DROP DATABASE IF EXISTS cf_db_verify'
+          echo "live translations=${live}  restored=${copy}"
+          [ "$live" = "$copy" ] && [ -n "$live" ] \
+            || { echo "RESTORE VERIFICATION FAILED"; exit 1; }
+
+      # ── R-3 · the same smoke suite deploy.yml gates on ───────────────────
+      # Through the WEB origin (frontend :8080), the path a user actually hits:
+      # nginx must proxy /health, /ready, /api/, /docs to the backend. Without
+      # the nginx.conf /health locations this step fails — which is precisely
+      # the class of bug a rehearsal exists to catch.
+      - name: R-3 · smoke the served stack
+        run: |
+          python scripts/smoke_test.py \
+            --api http://localhost:8080 \
+            --web http://localhost:8080 \
+            --expect-revision "${{ steps.migrate.outputs.revision }}"
+
+      - name: Publish evidence (build logs, revision, compose ps)
+        if: always()
+        run: |
+          mkdir -p /tmp/rehearsal-evidence
+          docker compose -f deploy/docker-compose.prod.yml ps > /tmp/rehearsal-evidence/compose-ps.txt 2>&1 || true
+          echo "rehearsal revision: ${{ steps.migrate.outputs.revision }}" > /tmp/rehearsal-evidence/revision.txt
+          { echo "api /health from the web origin:"; curl -fsS http://localhost:8080/health || echo "(unreachable)"; } \
+            > /tmp/rehearsal-evidence/health.txt 2>&1 || true
+      - name: Upload rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase5-rehearsal-evidence
+          path: |
+            /tmp/*.log
+            /tmp/rehearsal-evidence/
+          if-no-files-found: ignore
+
+      - name: Stack logs on failure
+        if: failure()
+        run: |
+          docker compose -f deploy/docker-compose.prod.yml logs --tail=200 || true
+
+      - name: Tear down the stack
+        if: always()
+        run: docker compose -f deploy/docker-compose.prod.yml down -v --remove-orphans

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - Check LocalStorage Token</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .box { background: white; padding: 20px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #45a049; }
+        pre { background: #f9f9f9; padding: 10px; border-left: 3px solid #4CAF50; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Frontend Debug Tool</h1>
+
+    <div class="box">
+        <h2>Step 1: Check if you're logged in</h2>
+        <button onclick="checkToken()">Check Token in LocalStorage</button>
+        <pre id="tokenInfo"></pre>
+    </div>
+
+    <div class="box">
+        <h2>Step 2: Test API Call with Token</h2>
+        <button onclick="testAPIWithToken()">Test API Call</button>
+        <pre id="apiResult"></pre>
+    </div>
+
+    <script>
+        function checkToken() {
+            const token = localStorage.getItem('access_token');
+            const output = document.getElementById('tokenInfo');
+
+            if (token) {
+                output.textContent = `✅ Token found!\n\nToken (first 50 chars): ${token.substring(0, 50)}...\n\nToken length: ${token.length} characters`;
+            } else {
+                output.textContent = '❌ No token found in localStorage!\n\nYou need to login first.';
+            }
+        }
+
+        async function testAPIWithToken() {
+            const token = localStorage.getItem('access_token');
+            const output = document.getElementById('apiResult');
+
+            if (!token) {
+                output.textContent = '❌ No token! Please login first.';
+                return;
+            }
+
+            const calcId = 'e771aa41-7bcf-48d8-b1ec-d1a06e17df41';
+
+            try {
+                output.textContent = '⏳ Calling API...';
+
+                const response = await fetch(`http://localhost:8004/api/forests/calculations/${calcId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    output.textContent = `❌ API Error (${response.status})\n\n${JSON.stringify(data, null, 2)}`;
+                    return;
+                }
+
+                const rd = data.result_data || {};
+                const blocks = rd.blocks || [];
+
+                const summary = {
+                    '✅ Response Status': response.status,
+                    'Forest Name': data.forest_name,
+                    'Status': data.status,
+                    '--- TOP LEVEL DATA ---': '---',
+                    'slope_dominant_class': rd.slope_dominant_class,
+                    'aspect_dominant': rd.aspect_dominant,
+                    'forest_type_dominant': rd.forest_type_dominant,
+                    'landcover_dominant': rd.landcover_dominant,
+                    '--- BLOCKS DATA ---': '---',
+                    'Number of blocks': blocks.length,
+                    'Block 0 name': blocks[0]?.block_name,
+                    'Block 0 area (ha)': blocks[0]?.area_hectares,
+                    'Block 0 slope': blocks[0]?.slope_dominant_class,
+                    'Block 0 aspect': blocks[0]?.aspect_dominant,
+                    'Block 0 elevation': blocks[0]?.elevation_mean_m
+                };
+
+                output.textContent = JSON.stringify(summary, null, 2);
+
+            } catch (error) {
+                output.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Auto-check token on load
+        window.onload = () => {
+            checkToken();
+        };
+    </script>
+</body>
+</html>

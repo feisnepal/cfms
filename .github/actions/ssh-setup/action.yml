@@ -1,0 +1,49 @@
+name: SSH setup
+description: >
+  Configure an SSH key and a pinned host key for deploying to the VPS.
+  Used by four jobs in deploy.yml, which is why it is a composite action rather
+  than eight duplicated lines in each of them.
+
+inputs:
+  key:
+    description: Private key (secrets.DEPLOY_SSH_KEY)
+    required: true
+  known_hosts:
+    description: >
+      Pinned host key (secrets.DEPLOY_SSH_KNOWN_HOSTS). Capture it once, from a
+      machine you trust, with `ssh-keyscan <host>`.
+    required: true
+  host:
+    description: user@host of the VPS (secrets.DEPLOY_SSH_HOST)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        SSH_KEY: ${{ inputs.key }}
+        SSH_KNOWN_HOSTS: ${{ inputs.known_hosts }}
+        SSH_HOST: ${{ inputs.host }}
+      run: |
+        mkdir -p ~/.ssh && chmod 700 ~/.ssh
+        printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        # A PINNED host key, not `ssh-keyscan` at deploy time. Scanning on every
+        # run means trusting whatever currently answers on that address — the
+        # exact attack host-key verification exists to prevent, performed
+        # automatically, on a connection that then runs commands as a user who
+        # can deploy. Capture it once from a machine you trust.
+        printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts
+        {
+          echo "Host deploy-target"
+          echo "  HostName ${SSH_HOST#*@}"
+          echo "  User ${SSH_HOST%@*}"
+          echo "  IdentityFile ~/.ssh/deploy_key"
+          echo "  StrictHostKeyChecking yes"
+          echo "  BatchMode yes"
+          echo "  ServerAliveInterval 30"
+        } >> ~/.ssh/config
+        chmod 600 ~/.ssh/config
+        ssh deploy-target 'echo "ssh ok: $(hostname)"'

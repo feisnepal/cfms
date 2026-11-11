@@ -1,0 +1,116 @@
+# .github/workflows/performance.yml
+# Phase 10 — Performance budget CI gate (Lighthouse) + baseline updates.
+#
+# Why not on every PR: this SPA is auth- + backend-gated, so a meaningful
+# Lighthouse run needs a live, seeded environment (or a deployed demo). The
+# deterministic, every-PR signal is `npm run perf:validate` (in ci.yml build
+# job) + the Phase 9 bundle budgets. This workflow runs the real audit:
+#
+#   * workflow_dispatch — point `baseUrl` at a healthy deployed app to audit
+#     (or leave blank to audit the locally-built app at :4173; detail pages
+#     then require a reachable backend at LIGHTHOUSE_BASE_URL's origin).
+#   * PR label `perf-check` — audit + post a scores comment on the PR.
+#
+# Required secrets (repo Settings -> Secrets and variables -> Actions):
+#   SENTRY_DSN               — passed to the frontend build as VITE_SENTRY_DSN so
+#                              Web Vitals / map-init / tab-switch measurements flow
+#                              to Sentry during the audit.
+#   LHCI_GITHUB_APP_TOKEN    — only needed if you switch lighthouserc.js upload to
+#                              githubStatusCheck / lhci's GitHub app commenting.
+#   LHCI_BASE_URL (optional) — default target when no baseUrl input is given.
+
+name: Performance gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseUrl:
+        description: "Base URL of the app to audit (e.g. https://demo.forest.example). Blank = audit the locally built app."
+        required: false
+        default: ""
+      calcId:
+        description: "Demo calculation id (defaults to the shared e2e demo calc)."
+        required: false
+        default: "15f64467-c857-4948-bb42-34eefadb88bc"
+      saveBaseline:
+        description: "Save results as the new .lighthouse-baseline.json (commit it)."
+        type: boolean
+        required: false
+        default: false
+  pull_request:
+    types: [labeled]
+
+jobs:
+  perf:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'perf-check') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Resolve audit base URL
+        id: base
+        run: |
+          BASE="${{ github.event.inputs.baseUrl }}"
+          if [ -z "$BASE" ]; then BASE="${{ secrets.LHCI_BASE_URL }}"; fi
+          if [ -z "$BASE" ]; then BASE="http://localhost:4173"; fi
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+
+      - name: Build frontend (with Sentry DSN when configured)
+        env:
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: npm run build
+
+      - name: Serve built app for local preview audit
+        if: steps.base.outputs.base == 'http://localhost:4173'
+        run: |
+          npm run preview -- --port 4173 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4173 > /dev/null 2>&1; then echo "preview up"; break; fi
+            sleep 1
+          done
+
+      - name: Run Lighthouse perf gate
+        env:
+          LIGHTHOUSE_BASE_URL: ${{ steps.base.outputs.base }}
+          LIGHTHOUSE_CALC_ID: ${{ github.event.inputs.calcId }}
+        run: |
+          if [ "${{ github.event.inputs.saveBaseline }}" == "true" ]; then
+            npm run perf:baseline
+          else
+            npm run perf:check
+          fi
+
+      - name: Upload Lighthouse reports (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: frontend/lighthouse-reports/
+          retention-days: 7
+
+      - name: Post perf scores comment on PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node scripts/post-perf-comment.mjs
+
+      - name: Fail if baseline changed and no commit is expected
+        if: steps.base.outputs.base != 'http://localhost:4173'
+        run: |
+          git diff --exit-code .lighthouse-baseline.json \
+            && echo "baseline unchanged" \
+            || echo "::warning::Baseline drifted — commit the updated .lighthouse-baseline.json if this is intended."

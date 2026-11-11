@@ -1,0 +1,732 @@
+{
+ "_comment": "API routes LACKING a response_model, keyed 'METHOD path'. Expected to SHRINK as models are added (H4.8, S3-47). Regenerate with: python scripts/check_response_model_baseline.py --update",
+ "total": 244,
+ "routes": {
+  "DELETE /api/v1/all-tree-exports/{export_id}": {
+   "description": "Delete all-tree export and associated files"
+  },
+  "DELETE /api/v1/biodiversity/calculations/{calculation_id}/species/{species_id}": {
+   "description": "Remove a species from calculation biodiversity inventory"
+  },
+  "DELETE /api/v1/blocks/calculations/{calculation_id}/blocks/{block_id}": {
+   "description": "Delete a forest block."
+  },
+  "DELETE /api/v1/calculations/{calculation_id}/boundary": {
+   "description": "Layer-level boundary delete.  Blocks (children) keep their geometry."
+  },
+  "DELETE /api/v1/calculations/{calculation_id}/fieldbook": {
+   "description": "Delete all fieldbook points for a calculation."
+  },
+  "DELETE /api/v1/calculations/{calculation_id}/user-group": {
+   "description": "Delete user group extent and all related analysis data"
+  },
+  "DELETE /api/v1/compartments/block/{block_id}/compartments": {
+   "description": "Delete all compartments for a block and restore trees to parent block"
+  },
+  "DELETE /api/v1/compartments/split/{split_history_id}": {
+   "description": "Undo a compartment split (delete compartments and restore trees)"
+  },
+  "DELETE /api/v1/compartments/{compartment_id}": {
+   "description": "Delete a single compartment or sub-compartment."
+  },
+  "DELETE /api/v1/dbh-classes/systems/{system_name}": {
+   "description": "Delete a classification system."
+  },
+  "DELETE /api/v1/field-inventory/{field_inventory_id}": {
+   "description": "Delete field inventory"
+  },
+  "DELETE /api/v1/forest-committee/advisory/{member_id}": {
+   "description": "Delete an advisory committee member"
+  },
+  "DELETE /api/v1/forest-committee/financial/{member_id}": {
+   "description": "Delete a financial committee member"
+  },
+  "DELETE /api/v1/forest-committee/main/{member_id}": {
+   "description": "Delete a main committee member"
+  },
+  "DELETE /api/v1/forest-committee/user-groups/{calculation_id}": {
+   "description": "Delete all committee data for a user group"
+  },
+  "DELETE /api/v1/forests/calculations/{calculation_id}": {
+   "description": "Delete a calculation"
+  },
+  "DELETE /api/v1/forests/calculations/{calculation_id}/blocks": {
+   "description": "Delete all forest blocks for a calculation."
+  },
+  "DELETE /api/v1/forests/calculations/{calculation_id}/blocks/{block_id}": {
+   "description": "Delete a forest block."
+  },
+  "DELETE /api/v1/forests/calculations/{calculation_id}/remove-species/{scientific_name}": {
+   "description": "Remove a species from the calculation's species list."
+  },
+  "DELETE /api/v1/forests/calculations/{calculation_id}/sub-areas": {
+   "description": "Delete ALL sub-areas from a calculation (context menu \"Delete Sub-Areas Data\")."
+  },
+  "DELETE /api/v1/forests/calculations/{calculation_id}/sub-areas/{sub_area_id}": {
+   "description": "Delete a sub-area from a calculation."
+  },
+  "DELETE /api/v1/forests/drafts/{draft_id}": {
+   "description": "Delete a draft."
+  },
+  "DELETE /api/v1/household/calculations/{calculation_id}/households": {
+   "description": "Delete all household records for a calculation (before re-upload)"
+  },
+  "DELETE /api/v1/household/households/{household_id}": {
+   "description": "Delete a household record"
+  },
+  "DELETE /api/v1/inventory/by-calculation/{calculation_id}/force": {
+   "description": "Force delete tree mapping for a calculation (overrides user ownership)"
+  },
+  "DELETE /api/v1/inventory/{inventory_id}": {
+   "description": "Delete tree mapping calculation and all associated trees"
+  },
+  "DELETE /api/v1/operational-plans/template-categories/{category_id}": {
+   "description": "Delete a template category (super admin only)"
+  },
+  "DELETE /api/v1/operational-plans/templates/{template_id}": {
+   "description": "Delete a user template"
+  },
+  "DELETE /api/v1/operational-plans/{plan_id}/tree/nodes/{node_id}": {
+   "description": "Delete a node from the document tree."
+  },
+  "DELETE /api/v1/sampling/{design_id}": {
+   "description": "Delete a sampling design."
+  },
+  "DELETE /api/v1/tree-models/{model_id}": {
+   "description": "Delete tree model and associated GPKG file"
+  },
+  "DELETE /api/v1/workspace/{calculation_id}/import-layers/{layer_id}": {
+   "description": "Soft-delete a workspace layer."
+  },
+  "DELETE /api/v1/workspace/{calculation_id}/import-layers/{layer_id}/features/{feature_index}": {
+   "description": "E3 — delete ONE feature from an imported/finalized layer (per-row delete)."
+  },
+  "DELETE /api/v1/yearly-activities/proposed-activities/{activity_id}/drawn-features/{feature_id}": {
+   "description": "Delete drawn feature"
+  },
+  "DELETE /api/v1/yearly-activities/proposed-activities/{activity_id}/spatial/{assignment_id}": {
+   "description": "Remove spatial assignment"
+  },
+  "DELETE /api/v1/yearly-activities/proposed-activities/{activity_id}/year-details/{detail_id}": {
+   "description": "Delete a year detail"
+  },
+  "DELETE /api/v1/yearly-activities/proposed-activities/{proposed_activity_id}": {
+   "description": "Remove an activity from the forest's yearly plan."
+  },
+  "GET    /api/v1/admin/boundary-disputes": {
+   "description": "List boundary disputes. SUPER_ADMIN only."
+  },
+  "GET    /api/v1/all-tree-exports/{export_id}/download": {
+   "description": "Download all-tree export GPKG file. File and DB record are auto-deleted after download."
+  },
+  "GET    /api/v1/all-tree-exports/{export_id}/sample-plot-gpkg": {
+   "description": "Download the sample-plot extracted GPKG derived from the all-tree export."
+  },
+  "GET    /api/v1/auth/roles": {
+   "description": "Get list of available user roles"
+  },
+  "GET    /api/v1/biodiversity/categories": {
+   "description": "Get available categories and sub-categories with counts"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/canopy-mask/{z}/{x}/{y}.png": {
+   "description": "Get canopy height tile - reads from local canopy_height5m.tif"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/demand-supply": {
+   "description": "Return demand vs supply data for all forest product categories"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/fieldbook": {
+   "description": "List all fieldbook points for a calculation."
+  },
+  "GET    /api/v1/calculations/{calculation_id}/geometry/delete-guard": {
+   "description": "R5 — returns {layer_type, feature_id, blocked, reasons[]}."
+  },
+  "GET    /api/v1/calculations/{calculation_id}/geometry/feature": {
+   "description": "E3 — capture a full snapshot of ONE row before it is deleted (undo)."
+  },
+  "GET    /api/v1/calculations/{calculation_id}/query": {
+   "description": "Get all raster values at a specific point"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/raster-layers": {
+   "description": "Read-only raster catalog for a calculation (owner-gated)."
+  },
+  "GET    /api/v1/calculations/{calculation_id}/steep-slope-mask/{z}/{x}/{y}.png": {
+   "description": "Get steep slope mask tile - shows areas with slope ABOVE the threshold"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/tile-token": {
+   "description": "Mint a short-lived tile token for a calculation the caller owns."
+  },
+  "GET    /api/v1/calculations/{calculation_id}/tiles/{layer_name}/{z}/{x}/{y}.png": {
+   "description": "Get a single raster tile for map visualization"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/tree-model/clusters": {
+   "description": "Tree cluster tile (U05)"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/unified-shell-status": {
+   "description": "Whether the unified shell is enabled for this calculation."
+  },
+  "GET    /api/v1/calculations/{calculation_id}/user-group-tiles/{layer_name}/{z}/{x}/{y}.png": {
+   "description": "Get raster tiles for user group extent with optional forest overlap exclusion"
+  },
+  "GET    /api/v1/calculations/{calculation_id}/user-group/query": {
+   "description": "Get land cover and biomass values at a specific point within user group extent"
+  },
+  "GET    /api/v1/compartments/calculation/{calculation_id}/all-blocks": {
+   "description": "Get all forest blocks and compartments for map display"
+  },
+  "GET    /api/v1/compartments/calculation/{calculation_id}/export-gpkg": {
+   "description": "Export all forest blocks and compartments to GPKG format"
+  },
+  "GET    /api/v1/compartments/calculation/{calculation_id}/export-kml": {
+   "description": "Export all forest blocks and compartments to KML format"
+  },
+  "GET    /api/v1/compartments/calculation/{calculation_id}/trees": {
+   "description": "Get all trees for a calculation to display on map"
+  },
+  "GET    /api/v1/compartments/calculations/{calculation_id}/compartment-tree": {
+   "description": "Get hierarchical tree of blocks → compartments → sub-compartments"
+  },
+  "GET    /api/v1/compartments/trees-needing-assignment/{block_id}": {
+   "description": "Get trees that need compartment assignment"
+  },
+  "GET    /api/v1/dbh-classes/systems": {
+   "description": "List all available DBH classification systems and their class counts."
+  },
+  "GET    /api/v1/dbh-classes/systems/{system_name}": {
+   "description": "Get a classification system definition with full class details."
+  },
+  "GET    /api/v1/dbh-classes/systems/{system_name}/history": {
+   "description": "Get change history for a classification system."
+  },
+  "GET    /api/v1/field-inventory/by-calculation/{calculation_id}": {
+   "description": "Get field inventory for a calculation"
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/export-10yr-plan-docx": {
+   "description": "Export 10-Year Management Plan DOCX with full chapter structure."
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/export-dfo-summary": {
+   "description": "# why: DFO-format summary with 15 sheets for division forest office regulatory reporting"
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/export-excel": {
+   "description": "# why: measurement-level export enables pivot tables for custom analysis and audit trails"
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/export-management-plan-docx": {
+   "description": "Export 10-Year Management Plan DOCX with 12 chapters, embedded maps,"
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/mai-aah": {
+   "description": "Calculate MAI and AAH tables for field inventory."
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/management-plan-data": {
+   "description": "# business: management plan data bundles 9 datasets for frontend charts"
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/species-breakdown": {
+   "description": "# business: species-wise breakdown by block or compartment for DFO reporting"
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/species-dbh-breakdown": {
+   "description": "Return species breakdown per DBH class (count, timber, fuelwood, volume)."
+  },
+  "GET    /api/v1/field-inventory/{field_inventory_id}/total-inventory": {
+   "description": "# business: total inventory = per-ha × block area for absolute quantities (CFMG §6.4)"
+  },
+  "GET    /api/v1/fieldbook": {
+   "description": "List all fieldbook records for the current user across all calculations."
+  },
+  "GET    /api/v1/forests/calculations/{calculation_id}/accessible-area": {
+   "description": "Calculate accessible forest area for calculation blocks."
+  },
+  "GET    /api/v1/forests/calculations/{calculation_id}/maps/boundary": {
+   "description": "Generate an SVG boundary map for the given calculation."
+  },
+  "GET    /api/v1/forests/calculations/{calculation_id}/maps/{layer}": {
+   "description": "Generate an SVG raster map for the given layer (slope, aspect, landcover, etc.)."
+  },
+  "GET    /api/v1/forests/calculations/{calculation_id}/species-summary": {
+   "description": "Get whole forest species summary auto-calculated from block-level confirmations."
+  },
+  "GET    /api/v1/forests/{forest_id}/nearby": {
+   "description": "Return forests within 200m of the given forest."
+  },
+  "GET    /api/v1/household/calculations/{calculation_id}/export": {
+   "description": "Export household data and analysis to Excel"
+  },
+  "GET    /api/v1/inventory/by-calculation/{calculation_id}/check": {
+   "description": "Check if ANY tree mapping exists for this calculation (regardless of owner)"
+  },
+  "GET    /api/v1/inventory/template": {
+   "description": "Download CSV template for tree inventory"
+  },
+  "GET    /api/v1/inventory/{inventory_id}/analysis": {
+   "description": "Get tree mapping analysis data for sm_* variables."
+  },
+  "GET    /api/v1/inventory/{inventory_id}/correction-preview": {
+   "description": "Get preview of boundary corrections for out-of-boundary trees"
+  },
+  "GET    /api/v1/inventory/{inventory_id}/export": {
+   "description": "Export inventory results (CSV or GeoJSON)"
+  },
+  "GET    /api/v1/inventory/{inventory_id}/grid-cells": {
+   "description": "Get grid cell polygons for a processed inventory."
+  },
+  "GET    /api/v1/location/ward/{ward_id}/geometry": {
+   "description": "Get ward boundary geometry for display on map"
+  },
+  "GET    /api/v1/op-tables": {
+   "description": "List all operational plan table definitions."
+  },
+  "GET    /api/v1/op-tables/{table_id}": {
+   "description": "Get the definition of a single operational plan table by ID."
+  },
+  "GET    /api/v1/op-tables/{table_id}/data": {
+   "description": "Get the data rows for an operational plan table."
+  },
+  "GET    /api/v1/operational-plans/calculation/{calculation_id}": {
+   "description": "Get the Operational Plan for a given calculation ID."
+  },
+  "GET    /api/v1/operational-plans/locations/districts": {
+   "description": "List districts with optional province filter."
+  },
+  "GET    /api/v1/operational-plans/locations/divisions": {
+   "description": "List forest divisions with optional province filter."
+  },
+  "GET    /api/v1/operational-plans/locations/municipalities": {
+   "description": "List municipalities with optional province, division, and sub-division filter."
+  },
+  "GET    /api/v1/operational-plans/locations/municipalities-by-district": {
+   "description": "List municipalities filtered by province and district."
+  },
+  "GET    /api/v1/operational-plans/locations/physiography-by-district": {
+   "description": "Get physiography and jurisdiction data for a given location."
+  },
+  "GET    /api/v1/operational-plans/locations/physiography-jurisdiction": {
+   "description": "Get physiography and jurisdiction details for cascaded location inputs."
+  },
+  "GET    /api/v1/operational-plans/locations/provinces": {
+   "description": "List all provinces for cascading location selection."
+  },
+  "GET    /api/v1/operational-plans/locations/sub-divisions": {
+   "description": "List sub-divisions with optional province and division filter."
+  },
+  "GET    /api/v1/operational-plans/locations/wards": {
+   "description": "List wards with optional cascade filters."
+  },
+  "GET    /api/v1/operational-plans/locations/wards-by-district": {
+   "description": "List wards filtered by province, district, and municipality."
+  },
+  "GET    /api/v1/operational-plans/template-categories": {
+   "description": "List all template categories"
+  },
+  "GET    /api/v1/operational-plans/templates": {
+   "description": "List templates (user's own + globally available)"
+  },
+  "GET    /api/v1/operational-plans/templates/pending-approval": {
+   "description": "Super admin: list templates pending approval"
+  },
+  "GET    /api/v1/operational-plans/templates/public": {
+   "description": "Browse all publicly available templates"
+  },
+  "GET    /api/v1/operational-plans/templates/{template_id}": {
+   "description": "Get full template details"
+  },
+  "GET    /api/v1/operational-plans/templates/{template_id}/versions": {
+   "description": "Get template version history"
+  },
+  "GET    /api/v1/operational-plans/variables": {
+   "description": "List all registered variables with optional category or search filter."
+  },
+  "GET    /api/v1/operational-plans/variables/export/csv": {
+   "description": "Superuser-only CSV export of enriched variable registry — 28 columns."
+  },
+  "GET    /api/v1/operational-plans/variables/{key}": {
+   "description": "Get detailed information for a single registered variable by key."
+  },
+  "GET    /api/v1/operational-plans/verify/{verification_code}": {
+   "description": "Resolve a verification code to the record of what was issued (H7.4)."
+  },
+  "GET    /api/v1/operational-plans/{calculation_id}/variable-catalog": {
+   "description": "Returns ALL variables with their resolved values for a given calculation."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/chart-data/{chart_type}": {
+   "description": "Get chart data for live Chart.js preview of a given chart type."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/editing-status": {
+   "description": "Check whether user can edit the plan (super_admin only)."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/export": {
+   "description": "Generate and download a DOCX Operational Plan."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/map-geojson": {
+   "description": "Get GeoJSON features (boundary and blocks) for Leaflet map preview."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/metadata-form": {
+   "description": "Get the metadata form with user inputs and system defaults for a plan."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/preview": {
+   "description": "Render the full Operational Plan as an HTML preview."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/preview/section/{node_id}": {
+   "description": "Render a single section as HTML preview."
+  },
+  "GET    /api/v1/operational-plans/{plan_id}/tree": {
+   "description": "Get the document tree for an Operational Plan."
+  },
+  "GET    /api/v1/report/{calculation_id}/data-completeness": {
+   "description": "Check which tabs have data and which are missing for report generation"
+  },
+  "GET    /api/v1/report/{calculation_id}/sections-available": {
+   "description": "Get list of sections that can be generated with available data"
+  },
+  "GET    /api/v1/report/{job_id}/download": {
+   "description": "Download the complete report as .docx"
+  },
+  "GET    /api/v1/report/{job_id}/preview": {
+   "description": "Preview report as HTML"
+  },
+  "GET    /api/v1/report/{job_id}/sections/{section_key}": {
+   "description": "Get a specific section's generated content"
+  },
+  "GET    /api/v1/report/{job_id}/status": {
+   "description": "Check report generation progress"
+  },
+  "GET    /api/v1/sampling": {
+   "description": "List all sampling designs for the current user across all calculations."
+  },
+  "GET    /api/v1/sampling/{design_id}/map-layers": {
+   "description": "Get GeoJSON layers for sampling map visualization:"
+  },
+  "GET    /api/v1/sampling/{design_id}/points": {
+   "description": "Get sampling points for a design."
+  },
+  "GET    /api/v1/species/all": {
+   "description": "Get all species in the database"
+  },
+  "GET    /api/v1/species/search": {
+   "description": "Search all species in tree_species_coefficients with full characteristics"
+  },
+  "GET    /api/v1/species/{code}": {
+   "description": "Get species by numeric code"
+  },
+  "GET    /api/v1/translations/csv": {
+   "description": ""
+  },
+  "GET    /api/v1/tree-models/{model_id}/download": {
+   "description": "Download tree model GPKG file"
+  },
+  "GET    /api/v1/tree-models/{model_id}/download-excel": {
+   "description": "Download tree model Excel file (regulation format)"
+  },
+  "GET    /api/v1/user-group/{extent_id}/export": {
+   "description": "Export user group map and statistics"
+  },
+  "GET    /api/v1/workspace/crs-options": {
+   "description": "Return available CRS options for CSV/XLSX import."
+  },
+  "GET    /api/v1/workspace/{calculation_id}/digitize-layers/{layer_id}/audit": {
+   "description": "Return the digitize audit trail for a layer (Gap 6.1 / Task 1.4.4)."
+  },
+  "GET    /api/v1/workspace/{calculation_id}/digitize-layers/{layer_id}/finalize-status": {
+   "description": "Poll finalize status (Gap 2.4). The layer's draft_status IS the state."
+  },
+  "GET    /api/v1/workspace/{calculation_id}/import-layers": {
+   "description": "Return all active workspace layers for a calculation."
+  },
+  "GET    /api/v1/workspace/{calculation_id}/import-layers/{layer_id}/features": {
+   "description": "Return the GeoJSON FeatureCollection for a specific imported layer."
+  },
+  "GET    /api/v1/yearly-activities/calculations/{calculation_id}/blocks-with-subareas": {
+   "description": "Get blocks with their sub-areas for a calculation"
+  },
+  "GET    /api/v1/yearly-activities/calculations/{calculation_id}/drawn-features/collision-check": {
+   "description": "Check if a proposed geometry collides with existing drawn features."
+  },
+  "GET    /api/v1/yearly-activities/calculations/{calculation_id}/drawn-features/intersecting": {
+   "description": "Get drawn features that intersect a given block geometry."
+  },
+  "GET    /api/v1/yearly-activities/calculations/{calculation_id}/proposed-activities/spatial": {
+   "description": "Get all proposed activities with their spatial geometries."
+  },
+  "GET    /api/v1/yearly-activities/proposed-activities/{activity_id}/export/gpkg": {
+   "description": "Export drawn spatial features to GPKG format."
+  },
+  "GET    /api/v1/yearly-activities/proposed-activities/{activity_id}/export/kml": {
+   "description": "Export drawn spatial features to KML format."
+  },
+  "PATCH  /api/v1/blocks/calculations/{calculation_id}/update-blocks": {
+   "description": "Update block geometries from the frontend editor."
+  },
+  "PATCH  /api/v1/compartments/blocks/{block_id}/toggle-lock": {
+   "description": "Toggle lock status to prevent/allow further division"
+  },
+  "PATCH  /api/v1/compartments/{compartment_id}/name": {
+   "description": "Update compartment name."
+  },
+  "PATCH  /api/v1/forests/calculations/{calculation_id}/geometry": {
+   "description": "Update the boundary geometry of a calculation."
+  },
+  "PATCH  /api/v1/forests/calculations/{calculation_id}/result-data": {
+   "description": "Update result_data fields for a calculation (field verification edits)"
+  },
+  "PATCH  /api/v1/forests/calculations/{calculation_id}/species/{scientific_name}/confirm": {
+   "description": "Toggle species confirmation status."
+  },
+  "PATCH  /api/v1/forests/calculations/{calculation_id}/sub-areas/{sub_area_id}": {
+   "description": "Update a sub-area's properties (name, category, geometry, etc.)"
+  },
+  "PATCH  /api/v1/forests/calculations/{calculation_id}/update-blocks": {
+   "description": "Update block geometries from the frontend editor."
+  },
+  "PATCH  /api/v1/workspace/{calculation_id}/import-layers/{layer_id}": {
+   "description": "Rename a workspace layer."
+  },
+  "PATCH  /api/v1/workspace/{calculation_id}/import-layers/{layer_id}/features/{feature_index}": {
+   "description": "Update properties of a single feature within an imported layer."
+  },
+  "POST   /api/v1/all-tree-exports/{export_id}/extract-sample-plots": {
+   "description": "Extract trees from the all-tree GPKG that fall within sample plot buffers."
+  },
+  "POST   /api/v1/auth/change-password": {
+   "description": "Change user password"
+  },
+  "POST   /api/v1/auth/logout": {
+   "description": "End every session for this user."
+  },
+  "POST   /api/v1/auth/refresh": {
+   "description": "Exchange a refresh token for a new pair, consuming the old one."
+  },
+  "POST   /api/v1/biodiversity/calculations/{calculation_id}/species/bulk": {
+   "description": "Bulk add multiple species to calculation"
+  },
+  "POST   /api/v1/blocks/calculations/{calculation_id}/clip-sub-areas": {
+   "description": "Clip all sub-areas to fit within their containing blocks."
+  },
+  "POST   /api/v1/blocks/calculations/{calculation_id}/recalculate-areas": {
+   "description": "Recalculate all area values for blocks and sub-areas using accurate geodesic calculations."
+  },
+  "POST   /api/v1/blocks/calculations/{calculation_id}/recompute-geo": {
+   "description": "Recompute geo_* derived properties for ALL geometry features in a calculation."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/auto-blocks/commit": {
+   "description": "Stage 2 — persist the accepted serial/merged blocks as forest_blocks."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/auto-blocks/preview": {
+   "description": "Stage 1 — clip `base.mmu` to the forest boundary (server-side only)."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/blocks/draw": {
+   "description": "E.7 — persist a user-drawn block/compartment clipped to the boundary."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/dfo-approve": {
+   "description": "Approve a completed map and lock its structure. completed -> locked."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/dfo-reject": {
+   "description": "Send a map back for rework. completed/locked -> draft."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/copy-boundary-to-block": {
+   "description": "D4 — clone boundary_geom → new ForestBlock, bump version."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/cut-line": {
+   "description": "{layer_type, feature_id, split_point} → split a LineString at a point."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/cut-polygon": {
+   "description": "{layer_type, feature_id, cut_line} → persists 2+ pieces."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/divide-equal-areas": {
+   "description": "{layer_type, feature_id, method, direction, count, rows, cols} → replace."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/divide-preview": {
+   "description": "Dry-run equal-area division — no persist, same response shape."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/edit-geometry": {
+   "description": "POST {layer_type, feature_id, geometry} → validated + persisted (R1/R6)."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/merge-features": {
+   "description": "UE-2.2 — {layer_type, feature_ids, layer_id?} → union N features into ONE."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/geometry/restore-feature": {
+   "description": "E3 — undo restore of exactly the deleted row (R5; no cascade)."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/preview-accessible-forest": {
+   "description": "Preview accessible and protected forest areas BEFORE creating sampling design."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/submit-for-calculation": {
+   "description": "Hand a draft map to the calculation queue. draft/failed -> submitted."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/super-admin-unlock": {
+   "description": "Break a structure lock. completed/locked -> draft. Super admin only."
+  },
+  "POST   /api/v1/calculations/{calculation_id}/withdraw-submission": {
+   "description": "Take a submitted map back, before analysis starts. submitted -> draft."
+  },
+  "POST   /api/v1/compartments/blocks/{block_id}/sub-divide": {
+   "description": "Divide a compartment into sub-compartments (extends execute_split logic)"
+  },
+  "POST   /api/v1/dbh-classes/classify": {
+   "description": "Classify a DBH value using the named system."
+  },
+  "POST   /api/v1/exports/cleanup": {
+   "description": "Delete old export files (GPKG, Excel, CSV) older than retention_days."
+  },
+  "POST   /api/v1/field-inventory/preview-mapping": {
+   "description": "Preview automatic column mapping for uploaded CSV file"
+  },
+  "POST   /api/v1/field-inventory/upload": {
+   "description": "Upload and validate field inventory CSV"
+  },
+  "POST   /api/v1/field-inventory/{field_inventory_id}/process": {
+   "description": "Process validated field inventory"
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/add-species": {
+   "description": "Add a species to a calculation's species list"
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/edit-boundary": {
+   "description": "Interactive boundary editing endpoint."
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/generate-maps": {
+   "description": "Generate maps on-demand for a calculation"
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/merge-forest-boundary": {
+   "description": "Merge one or more geometry pieces into the single forest boundary."
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/recalculate-areas": {
+   "description": "Recalculate all area values for blocks and sub-areas using accurate geodesic calculations."
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/species/confirm-all": {
+   "description": "Confirm or unconfirm all species at once."
+  },
+  "POST   /api/v1/forests/calculations/{calculation_id}/tree-cover-areas": {
+   "description": "Calculate tree cover areas for all blocks and store in calculation result_data."
+  },
+  "POST   /api/v1/household/calculations/{calculation_id}/template": {
+   "description": "Download Excel template for household information entry"
+  },
+  "POST   /api/v1/inventory/confirm-mapping": {
+   "description": "Confirm column mapping and upload inventory CSV."
+  },
+  "POST   /api/v1/inventory/preview-mapping": {
+   "description": "Preview automatic column mapping for uploaded CSV file."
+  },
+  "POST   /api/v1/inventory/{inventory_id}/accept-corrections": {
+   "description": "Apply boundary corrections and proceed with processing"
+  },
+  "POST   /api/v1/inventory/{inventory_id}/update-block-subarea": {
+   "description": "Resolve block, sub-area, and compartment hierarchy for all trees"
+  },
+  "POST   /api/v1/op-tables/{table_id}/auto-populate": {
+   "description": "Auto-populate an operational plan table from system data."
+  },
+  "POST   /api/v1/operational-plans": {
+   "description": "Create a new Operational Plan with auto-populated variables."
+  },
+  "POST   /api/v1/operational-plans/template-categories": {
+   "description": "Create a template category (super admin only)"
+  },
+  "POST   /api/v1/operational-plans/templates": {
+   "description": "Save a new template"
+  },
+  "POST   /api/v1/operational-plans/templates/{template_id}/clone": {
+   "description": "Clone a template"
+  },
+  "POST   /api/v1/operational-plans/templates/{template_id}/review": {
+   "description": "Super admin: approve or reject a template"
+  },
+  "POST   /api/v1/operational-plans/templates/{template_id}/rollback": {
+   "description": "Rollback template to a previous version"
+  },
+  "POST   /api/v1/operational-plans/templates/{template_id}/submit": {
+   "description": "Submit a private template for global approval"
+  },
+  "POST   /api/v1/operational-plans/{plan_id}/auto-populate": {
+   "description": "Auto-populate all registered variables into the document tree."
+  },
+  "POST   /api/v1/operational-plans/{plan_id}/clear-map-cache": {
+   "description": "Clear the map tile cache for this plan's layers."
+  },
+  "POST   /api/v1/operational-plans/{plan_id}/export-break-lock": {
+   "description": "Force-break an export lock (SUPER_ADMIN only)."
+  },
+  "POST   /api/v1/operational-plans/{plan_id}/export-heartbeat": {
+   "description": "Update export heartbeat to keep lease alive during long exports."
+  },
+  "POST   /api/v1/operational-plans/{plan_id}/save-as-template": {
+   "description": "Save current operational plan as a template"
+  },
+  "POST   /api/v1/operational-plans/{plan_id}/tree/nodes": {
+   "description": "Add a new node to the document tree."
+  },
+  "POST   /api/v1/report/{calculation_id}/generate": {
+   "description": "Generate report sections using AI"
+  },
+  "POST   /api/v1/species/validate-column": {
+   "description": "Validate a column of species data (for CSV uploads)"
+  },
+  "POST   /api/v1/workspace/{calculation_id}/boundary/preview-mapping": {
+   "description": "Preview column mapping + Nepal-extent validation for a boundary point file."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/digitize-layers": {
+   "description": "Create a new draft digitize-layer (Gap 1.1: draft_status=ACTIVE)."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/digitize-layers/{layer_id}/features/bulk": {
+   "description": "Bulk upsert/delete features on a digitize layer (Gaps 2.1, 1.4, 2.2, 6.2)."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/digitize-layers/{layer_id}/finalize": {
+   "description": "Finalize a digitize draft (Gap 2.4: async 202 + polling; sync fallback)."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/geometry-import-backup/restore": {
+   "description": "Restore the most recent geometry-import backup for the given target_type"
+  },
+  "POST   /api/v1/workspace/{calculation_id}/import-layer": {
+   "description": "Import a new layer into the workspace."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/import-layers/duplicate": {
+   "description": "Duplicate a workspace layer (deep copy)."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/import-layers/recompute-geo": {
+   "description": "Backfill geo_* derived properties for ALL imported layers in a calculation."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/import-layers/{layer_id}/convert-to-builtin": {
+   "description": "Convert an imported layer to a builtin layer type (blocks, compartments, etc.)."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/import-layers/{layer_id}/features/restore": {
+   "description": "E3 — undo: re-insert ONE feature to an imported/finalized layer."
+  },
+  "POST   /api/v1/workspace/{calculation_id}/polygon-from-points": {
+   "description": "Case E (interactive): user clicks N points on the map → shared engine's"
+  },
+  "PUT    /api/v1/blocks/calculations/{calculation_id}/boundary": {
+   "description": "Update the forest boundary geometry."
+  },
+  "PUT    /api/v1/dbh-classes/systems/{system_name}": {
+   "description": "Update a classification system definition."
+  },
+  "PUT    /api/v1/forests/calculations/{calculation_id}/boundary": {
+   "description": "Update the forest boundary geometry."
+  },
+  "PUT    /api/v1/op-tables/{table_id}/data": {
+   "description": "Update the data rows for an operational plan table."
+  },
+  "PUT    /api/v1/operational-plans/template-categories/{category_id}": {
+   "description": "Update a template category (super admin only)"
+  },
+  "PUT    /api/v1/operational-plans/templates/{template_id}": {
+   "description": "Update a template"
+  },
+  "PUT    /api/v1/operational-plans/templates/{template_id}/publish": {
+   "description": "Toggle template publish status"
+  },
+  "PUT    /api/v1/operational-plans/{plan_id}": {
+   "description": "Update an existing Operational Plan's tree, sections, or status."
+  },
+  "PUT    /api/v1/operational-plans/{plan_id}/metadata-form": {
+   "description": "Update the metadata form with user inputs and hybrid overrides."
+  },
+  "PUT    /api/v1/operational-plans/{plan_id}/tree/nodes/{node_id}": {
+   "description": "Update a specific node in the document tree."
+  },
+  "PUT    /api/v1/operational-plans/{plan_id}/tree/reorder": {
+   "description": "Reorder nodes in the document tree by moving a node to a new parent or position."
+  },
+  "PUT    /api/v1/operational-plans/{plan_id}/update-default-template": {
+   "description": "Update the global system default template from current plan"
+  },
+  "PUT    /api/v1/report/{job_id}/sections/{section_key}": {
+   "description": "Update/edit a section's content"
+  }
+ }
+}

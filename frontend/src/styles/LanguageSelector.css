@@ -1,0 +1,24 @@
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #4b5563;
+}
+
+.language-selector--compact {
+  gap: 6px;
+  color: #ffffff;
+}
+
+.language-selector--compact .ant-segmented,
+.language-selector--compact .ant-segmented .ant-segmented-item {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.language-selector--compact .ant-segmented-item-label {
+  color: #ffffff;
+}
+
+.language-selector--compact .ant-segmented-item-selected .ant-segmented-item-label {
+  color: #166534;
+}

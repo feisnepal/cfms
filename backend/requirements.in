@@ -1,0 +1,150 @@
+# Direct dependencies — the source of truth (H1.2 / S1-25).
+#
+# `requirements.txt` is GENERATED from this file and must not be hand-edited:
+#
+#     pip-compile --generate-hashes requirements.in -o requirements.txt
+#
+# Run it on the supported interpreter (Python 3.11 — see /.python-version), not
+# on whatever happens to be on PATH. A lock resolved on a different Python can
+# select different wheels, which is how this project ended up running geopandas
+# 1.1.2 against a pinned 0.14.1. CI regenerates and verifies the lock on 3.11;
+# see the `deps-lock` job in .github/workflows/ci.yml.
+#
+# Transitive dependencies belong in the lock, not here. Add a package here only
+# when the application imports it directly.
+
+# ── Web framework ──
+fastapi==0.139.2
+uvicorn[standard]==0.48.0
+# 0.0.7 -> 0.0.32 (2026-08-25). Two independent reasons, either sufficient:
+#   - CVE-2026-53539: a crafted form-urlencoded body. Trivy flags it against the
+#     backend image; the tracker has carried it as "16 advisories,
+#     network-reachable" since Phase 1.
+#   - fastapi==0.139.2 requires python-multipart>=0.0.18, so the pin was BELOW
+#     what the pinned FastAPI itself asks for.
+# Safe here: the application never imports `multipart` directly, only FastAPI's
+# Form and UploadFile, so the library's internal module rename does not reach us.
+python-multipart==0.0.32
+slowapi==0.1.10
+
+# ── Database ──
+sqlalchemy==2.0.45
+psycopg2-binary==2.9.11
+alembic==1.18.4
+
+# ── Geospatial ──
+# Pinned tightly and deliberately: these carry compiled GEOS/GDAL/PROJ bindings,
+# and a minor bump can silently change CRS handling or predicate results. Treat
+# any change here as a code change — see report S1-25.
+geoalchemy2==0.20.0
+shapely==2.1.2
+# fiona REMOVED 2026-08-25. It carried CVE-2023-45853 (CRITICAL, bundled
+# MiniZip) and CVE-2020-14152 (HIGH), which failed the Trivy image scan.
+# Its only use in the codebase was one GPKG export in api/compartments.py,
+# now written with pyogrio below -- geopandas' default engine, already a
+# dependency, the same GDAL underneath. Removing it retires the finding
+# permanently instead of tracking fiona's advisories forever, and drops a
+# compiled dependency the project did not need. Do not re-add it:
+# tests/test_compartment_gpkg_export.py fails on any fiona import in app/.
+pyproj==3.7.2
+geopandas==1.1.2
+pyogrio==0.12.1
+rasterio==1.4.4
+pyshp==3.1.4
+geojson==3.3.0
+
+# ── Authentication & security ──
+PyJWT[crypto]==2.13.0
+bcrypt==4.0.1
+python-dotenv==1.2.1
+pydantic[email]==2.13.4
+pydantic-settings==2.14.1
+nepali-datetime==1.0.8.5
+
+# ── Utilities ──
+python-dateutil==2.9.0.post0
+pandas==2.3.3
+
+# ── Document export ──
+python-docx==1.2.0
+contextily==1.7.0
+
+# ── Testing ──
+pytest==9.0.3
+pytest-asyncio==1.3.0
+# H1.7 — test-suite integrity plugins.
+# randomly: order-dependence fails immediately instead of being baked in.
+# xdist:    a >10-minute serial suite does not get run, and a suite that is
+#           not run is not a gate.
+# timeout:  a hung test used to hang the job forever; there was no timeout
+#           anywhere in CI.
+pytest-randomly==3.15.0
+pytest-xdist==3.6.1
+pytest-timeout==2.3.1
+# H1.9 — coverage measurement. Absent entirely before this: 1,297 backend
+# tests could not be related to the ~114k lines they nominally cover.
+pytest-cov==5.0.0
+# UNDECLARED until 2026-08-25. tests/conftest.py registers a Hypothesis profile
+# (H1.17, to suppress a `too_slow` health check under xdist) and three property
+# suites import it, so a clean install collected them as ERRORs. The earlier
+# undeclared-import audit missed it by scanning app/ only, not tests/ — the
+# import graph that has to resolve is both.
+hypothesis==6.112.1
+# httpx was pinned to 0.27.2 because starlette 0.27.0 (then required by fastapi
+# 0.104.1) passed `app=app` positionally to httpx.Client, which 0.28 forbade.
+# That rationale is dead: this project now runs fastapi 0.139.2 / starlette 1.1.0,
+# and the full 1,297-test suite — TestClient paths included — passes on httpx
+# 0.28.1. Floor set at 0.28 rather than restoring the stale pin.
+httpx>=0.28,<0.29
+
+# ── Caching ──
+# Previously unpinned (>=0.2.2). Pinned to the version this project is verified
+# against; an unpinned dependency is an unreproducible build.
+# The [redis] extra is deliberately NOT requested: it constrains redis<5.0.0,
+# which conflicts with arq's redis<6,>=4.2.0 and with the redis 5.3.1 this
+# project actually runs. The extra only pulls redis in, and redis is pinned
+# directly below — `fastapi_cache.backends.redis` imports fine without it.
+# Verified: pip check is clean, and the extra is not installed today.
+fastapi-cache2==0.2.2
+redis==5.3.1
+cachetools==7.1.4
+
+# ── Observability ──
+sentry-sdk==2.14.0
+prometheus-fastapi-instrumentator==8.0.2
+
+# ── Background task queue (report T15 — report/export jobs) ──
+arq==0.28.0
+
+# ── Fuzzy matching (species names, spreadsheet column mapping) ──
+# UNDECLARED until 2026-08-25. `from fuzzywuzzy import fuzz` sits at module
+# level in app/services/validators/species_matcher.py and app/utils/column_mapper.py,
+# both reached from api/inventory.py, api/species.py and api/workspace.py — so a
+# clean install of this file produced an application that could not import, and
+# every Docker build shipped one. It survived because it was installed on the
+# developer machine and CI had never once started the app.
+# python-Levenshtein is fuzzywuzzy's C backend: without it fuzzywuzzy warns on
+# import and falls back to a pure-Python matcher roughly an order of magnitude
+# slower, which matters when mapping every column of a large inventory upload.
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.27.3
+
+# ── Excel and SVG rendering ──
+# Both UNDECLARED until 2026-08-25, and both absent from the lock entirely.
+# Unlike fuzzywuzzy above these are imported inside functions, so they do not
+# break startup — they break the feature, at the moment somebody uses it:
+#   openpyxl : the household Excel template, inventory upload parsing,
+#              excel_validator, and every .xlsx export (4 modules)
+#   CairoSVG : SVG->PNG for the charts embedded in the operational plan
+# A clean install would have produced an app that starts, passes a health
+# check, and then fails the first time a district officer exports a workbook.
+openpyxl==3.1.2
+CairoSVG==2.9.0
+
+# mplcairo : renders matplotlib figures through cairo (HarfBuzz text shaping) so
+# Devanagari conjuncts (क्ष, त्र, ज्ञ) in map & chart labels come out correct.
+# Imported lazily in app.core.text_shaping; absent → Agg fallback (correct font,
+# imperfect shaping), never a startup failure. Needs libcairo (+ its HarfBuzz);
+# manylinux wheels bundle it. THEMATIC_MAP_VARIABLES_PLAN §3.8 / P2.
+mplcairo==0.6.1
+

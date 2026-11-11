@@ -1,0 +1,70 @@
+# load-tests/artillery-map-workspace.yml
+# Phase 11 — Artillery alternative to the k6 suite (same routes/metrics).
+#
+# Run:
+#   artillery run load-tests/artillery-map-workspace.yml \
+#     --env BASE_URL=http://localhost:4173 \
+#     --env TEST_AUTH_TOKEN=xxx
+# Or with the default env values below (demo login).
+config:
+  target: "{{ $processEnvironment.BASE_URL || 'http://localhost:4173' }}"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 30
+      arrivalRate: 50
+      name: "Spike"
+    - duration: 60
+      arrivalRate: 10
+      name: "Cool down"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+  ensure:
+    thresholds:
+      - "http.response_time.p95": 2000
+      - "http.codes.5xx": ["count < 10"]
+
+scenarios:
+  - name: "Browse workspace"
+    flow:
+      # Login once per virtual user (bearer token for the API calls below).
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "{{ $processEnvironment.LOAD_TEST_USER || 'demo@forest.com' }}"
+            password: "{{ $processEnvironment.LOAD_TEST_PASSWORD || 'Demo1234' }}"
+          capture:
+            - json: "$.access_token"
+              as: "token"
+      - get:
+          url: "/my-uploads"
+          capture:
+            - json: "$.status"
+              as: "listStatus"
+          expect:
+            statusCode: 200
+      - think: 1
+      - get:
+          url: "/api/forests/calculations/{{ $processEnvironment.CALC_ID || '15f64467-c857-4948-bb42-34eefadb88bc' }}"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            statusCode: 200
+      - think: 2
+      - get:
+          url: "/api/forests/calculations/{{ $processEnvironment.CALC_ID || '15f64467-c857-4948-bb42-34eefadb88bc' }}/blocks"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            statusCode: 200
+      - think: 2
+      - get:
+          url: "/calculations/{{ $processEnvironment.CALC_ID || '15f64467-c857-4948-bb42-34eefadb88bc' }}/tabbed?tab=reports"
+          expect:
+            statusCode: 200
+      - think: 2

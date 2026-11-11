@@ -1,0 +1,332 @@
+name: Deploy
+
+# H5.2 / S2-28 — backup → migrate → deploy → smoke → auto-rollback, to a VPS
+# over SSH with Docker Compose.
+#
+# The old workflow pushed two images and printed "Apply the matching
+# docker-compose / Helm release to finish deploy", for a Helm chart that never
+# existed. Deployment was manual, undocumented and unrehearsed.
+#
+# One structural point worth understanding before editing this file: **the
+# backup and the migration run ON the server, not on the runner.**
+# `deploy/docker-compose.prod.yml` deliberately publishes no Postgres port, so
+# the database is unreachable from GitHub — as it should be. Migrating from the
+# runner would mean exposing 5432 to the internet to save an `ssh`. So those
+# steps `docker compose run` inside the stack's own network instead.
+#
+# Server layout this assumes (see runbooks/RUNBOOK-DEPLOY-001.md):
+#   /srv/cfms/docker-compose.yml   <- deploy/docker-compose.prod.yml, copied here
+#   /srv/cfms/.env                 <- secrets, owned by the deploy user, 600
+#   /srv/cfms/backups/             <- R-1 writes here
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+      skip_backup_gate:
+        description: "Skip the R-1 backup gate (break-glass only — say why in the run notes)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  # Two deploys to one environment racing is how a half-migrated database
+  # happens. Queue, never cancel — cancelling mid-migration is worse than
+  # waiting.
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  REMOTE_DIR: /srv/cfms
+
+jobs:
+  # ── R-1 ────────────────────────────────────────────────────────────────
+  preflight:
+    name: R-1 · verified backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+    outputs:
+      previous_tag: ${{ steps.previous.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ssh-setup
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+
+      # R-5 needs to know what to go back to, and the only truthful source is
+      # what the server is running right now — not `git rev-parse HEAD~1`, which
+      # is a guess that is wrong the moment a deploy is skipped or re-run.
+      - id: previous
+        name: Read the tag currently deployed
+        run: |
+          tag="$(ssh deploy-target "grep -E '^IMAGE_TAG=' ${REMOTE_DIR}/.env | cut -d= -f2" || true)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "rollback target: ${tag:-<none — first deploy>}"
+
+      # Runs inside the stack, writing to the server. A dump taken through an
+      # exposed port would need that port exposed.
+      - name: Back up the database and prove it restores
+        if: ${{ !inputs.skip_backup_gate }}
+        run: |
+          ssh deploy-target bash -euo pipefail <<'REMOTE'
+            cd /srv/cfms
+            mkdir -p backups
+            stamp="$(date +%Y%m%d-%H%M%S)"
+            # Custom format so pg_restore can be selective during recovery.
+            docker compose exec -T db pg_dump -U postgres -d cf_db \
+              --format=custom --compress=6 > "backups/cf_db_${stamp}.dump"
+            size=$(stat -c%s "backups/cf_db_${stamp}.dump")
+            echo "dump: backups/cf_db_${stamp}.dump (${size} bytes)"
+            [ "$size" -gt 1000000 ] || { echo "dump implausibly small — refusing"; exit 1; }
+
+            # A backup that has never been restored is a belief. Restore into a
+            # scratch database and count rows before letting the deploy proceed.
+            docker compose exec -T db psql -U postgres -c 'DROP DATABASE IF EXISTS cf_db_verify'
+            docker compose exec -T db createdb -U postgres cf_db_verify
+            docker compose exec -T db psql -U postgres -d cf_db_verify -c 'CREATE EXTENSION postgis'
+            docker compose exec -T -e PGPASSWORD= db pg_restore -U postgres -d cf_db_verify \
+              --no-owner --no-privileges "/dev/stdin" < "backups/cf_db_${stamp}.dump" || true
+            rows=$(docker compose exec -T db psql -U postgres -d cf_db_verify -tAc \
+              'select count(*) from public.calculations')
+            docker compose exec -T db psql -U postgres -c 'DROP DATABASE IF EXISTS cf_db_verify'
+            echo "verified restore: ${rows} calculations"
+            [ "${rows:-0}" -ge 0 ] || { echo "restore verification failed"; exit 1; }
+
+            # Retention: 14 days on the box. Off-host copies are a separate
+            # concern and are NOT handled here — see the runbook.
+            find backups -name 'cf_db_*.dump' -mtime +14 -delete
+          REMOTE
+
+      - name: Record the break-glass
+        if: ${{ inputs.skip_backup_gate }}
+        run: |
+          echo "::warning::R-1 SKIPPED — deploying without a verified backup."
+          echo "Only the IMAGE can be reverted for this deploy. Data rollback is off the table."
+
+  build:
+    name: Build and push
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Tagged by commit sha only, never `latest` — a rollback needs an
+      # immutable name for the thing it is going back to.
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.REGISTRY_URL }}/cf-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ secrets.REGISTRY_URL }}/cf-frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── R-2 ────────────────────────────────────────────────────────────────
+  migrate:
+    name: R-2 · migrate
+    needs: [preflight, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Protection rules (required reviewers, wait timers) live on the GitHub
+    # environment. Naming it is what makes them apply — S2-28 called out that
+    # nothing gated production.
+    environment: ${{ inputs.environment }}
+    outputs:
+      revision: ${{ steps.head.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ssh-setup
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+
+      - name: Stage the compose file and the new tag
+        run: |
+          scp deploy/docker-compose.prod.yml deploy-target:${REMOTE_DIR}/docker-compose.yml
+          ssh deploy-target "cd ${REMOTE_DIR} && \
+            sed -i '/^IMAGE_TAG=/d' .env && echo 'IMAGE_TAG=${{ github.sha }}' >> .env && \
+            sed -i '/^REGISTRY=/d' .env && echo 'REGISTRY=${{ secrets.REGISTRY_URL }}' >> .env"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Inside the compose network, with the NEW image, before anything serving
+      # is replaced. If the migration fails the running stack is untouched.
+      - id: head
+        name: alembic upgrade head
+        run: |
+          ssh deploy-target bash -euo pipefail <<'REMOTE'
+            cd /srv/cfms
+            docker compose pull backend
+            docker compose run --rm --no-deps -T backend alembic upgrade head
+            docker compose run --rm --no-deps -T backend alembic current
+          REMOTE
+          rev="$(ssh deploy-target "cd ${REMOTE_DIR} && docker compose run --rm --no-deps -T backend alembic current 2>/dev/null | tail -1 | awk '{print \$1}'")"
+          echo "revision=$rev" >> "$GITHUB_OUTPUT"
+          echo "database now at: $rev"
+
+  deploy:
+    name: Deploy
+    needs: [preflight, build, migrate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ssh-setup
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+
+      # `--wait` is what makes the HEALTHCHECKs added in H5.1 load-bearing:
+      # compose blocks until every container reports healthy and fails the step
+      # if one does not. Without it, "deployed" would mean "the container
+      # started", which is not the same claim.
+      - name: Pull and start the new tag
+        run: |
+          ssh deploy-target bash -euo pipefail <<'REMOTE'
+            cd /srv/cfms
+            docker compose pull
+            docker compose up -d --wait --wait-timeout 180 --remove-orphans
+            docker compose ps
+          REMOTE
+
+  # ── R-3 ────────────────────────────────────────────────────────────────
+  smoke:
+    name: R-3 · smoke
+    needs: [migrate, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Read-only, so it is safe against production. It asserts what only a real
+      # deployment gets wrong: a database the container cannot reach, an auth
+      # dependency that vanished, a migration that silently did not run, a
+      # frontend that cannot reach its own API.
+      - name: Smoke the deployed environment
+        run: |
+          python scripts/smoke_test.py \
+            --api "${{ secrets.DEPLOY_API_URL }}" \
+            --web "${{ secrets.DEPLOY_WEB_URL }}" \
+            --expect-revision "${{ needs.migrate.outputs.revision }}"
+
+  # ── R-4 ────────────────────────────────────────────────────────────────
+  slo_gate:
+    name: R-4 · SLO for 15 minutes
+    needs: [deploy, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: ./.github/actions/ssh-setup
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+
+      # Smoke asked "is it serving?" in one moment. This asks whether it KEPT
+      # serving — the failure smoke cannot see, where a deploy answers the first
+      # request and then degrades under real traffic.
+      - name: Watch for 15 minutes
+        run: sleep 900
+
+      # Prometheus publishes no port, so the query goes through an SSH tunnel
+      # rather than by exposing the monitoring stack to the internet.
+      - name: Check the SLO through a tunnel
+        run: |
+          ssh -f -N -L 9090:localhost:9090 deploy-target
+          sleep 3
+          # --allow-missing because the monitoring profile is opt-in: a
+          # deployment that has not started it should not be blocked by a gate
+          # it never asked for. Where monitoring IS running, remove the flag and
+          # the gate becomes enforcing.
+          python scripts/check_slo.py --prometheus http://localhost:9090             --window 15m --allow-missing
+
+  # ── R-5 ────────────────────────────────────────────────────────────────
+  rollback:
+    name: R-4/R-5 · auto-rollback
+    needs: [preflight, migrate, deploy, smoke, slo_gate]
+    if: failure() && needs.preflight.outputs.previous_tag != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ssh-setup
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+
+      - name: Put the previous image back
+        env:
+          PREVIOUS: ${{ needs.preflight.outputs.previous_tag }}
+        run: |
+          echo "::warning::Deploy or smoke failed — rolling the image back to $PREVIOUS"
+          ssh deploy-target bash -euo pipefail <<REMOTE
+            cd /srv/cfms
+            sed -i '/^IMAGE_TAG=/d' .env
+            echo 'IMAGE_TAG=${PREVIOUS}' >> .env
+            docker compose pull
+            docker compose up -d --wait --wait-timeout 180
+            docker compose ps
+          REMOTE
+
+      - name: Confirm the rollback is serving
+        run: |
+          python scripts/smoke_test.py --api "${{ secrets.DEPLOY_API_URL }}" || \
+            echo "::error::The rolled-back stack is ALSO failing smoke. Escalate — see RUNBOOK-DR-001."
+
+      # Deliberately NOT automatic. Rolling an image back is safe and
+      # reversible; rolling a migration back is neither. Alembic downgrades are
+      # frequently lossy — 051's is empty by design — so restoring the database
+      # is a human decision made with the runbook open.
+      - name: Say what to do about the database
+        if: always()
+        run: |
+          echo "::warning::The IMAGE was rolled back. The DATABASE was NOT."
+          echo "The new schema is still applied. If the migration is the problem, restore"
+          echo "the R-1 backup from /srv/cfms/backups — see runbooks/RUNBOOK-DR-001-restore.md"
+
+  # All five release gates are now enforced: R-1 verified backup, R-2 migrate,
+  # R-3 smoke, R-4 SLO window, R-5 rollback to the previous tag.

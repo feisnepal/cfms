@@ -1,0 +1,16 @@
+# backend context
+venv/
+__pycache__/
+*.pyc
+.git/
+.env
+redis-bin/
+tests/
+.pytest_cache/
+
+# frontend context
+node_modules/
+dist/
+.git/
+.env
+.env.local

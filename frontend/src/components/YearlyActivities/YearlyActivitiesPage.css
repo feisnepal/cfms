@@ -1,0 +1,419 @@
+/* YearlyActivitiesPage Styles */
+
+.yearly-activities-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f5f5;
+  padding: 16px;
+}
+
+.yearly-activities-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 16px;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Summary Bar */
+.summary-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.summary-bar .ant-statistic-title {
+  font-size: 12px;
+  color: #666;
+}
+
+.summary-bar .ant-statistic-content {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Add Activity Bar */
+.add-activity-bar {
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Activity Cards */
+.activity-cards {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 80px;
+}
+
+/* Activity Card */
+.activity-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.activity-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.activity-card.expanded {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.activity-card .ant-card-head {
+  background: #fafafa;
+  border-radius: 8px 8px 0 0;
+  min-height: auto;
+  padding: 12px 16px;
+}
+
+.activity-card .ant-card-body {
+  padding: 16px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.card-header:hover {
+  background: #f5f5f5;
+  margin: -8px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-content {
+  padding-top: 16px;
+}
+
+.content-section {
+  margin-bottom: 16px;
+}
+
+.content-section label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header label {
+  margin-bottom: 0;
+}
+
+/* Checkbox List */
+.checkbox-list {
+  margin-top: 8px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkbox-list .ant-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Drawing Panel */
+.drawing-panel {
+  height: 400px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+/* Feature List */
+.feature-list {
+  margin-top: 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Year Budget Grid */
+.year-budget-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.year-budget-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: white;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #e8e8e8;
+  min-width: 90px;
+}
+
+.budget-total {
+  padding: 12px;
+  background: #e6f7ff;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 16px;
+}
+
+/* Footer */
+.page-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #e8e8e8;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .year-budget-grid {
+    gap: 4px;
+  }
+  
+  .year-budget-item {
+    min-width: 80px;
+    font-size: 11px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .card-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* Empty State */
+.activity-cards .ant-empty {
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Activity Matrix Overview */
+.activity-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.matrix-program-group {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.matrix-program-header {
+  padding: 10px 16px;
+  background: #f0f5ff;
+  border-bottom: 1px solid #d6e4ff;
+}
+
+.matrix-program-group .ant-table-wrapper {
+  margin: 0;
+}
+
+.matrix-program-group .ant-table {
+  font-size: 12px;
+}
+
+.matrix-program-group .ant-table-thead > tr > th {
+  background: #fafafa;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.matrix-program-group .ant-table-tbody > tr > td {
+  padding: 6px 8px;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.matrix-program-group .ant-table-tbody > tr:hover > td {
+  background: #e6f7ff !important;
+}
+
+.matrix-program-group .ant-table-tbody > tr > td:first-child {
+  font-weight: 500;
+}
+
+/* Dimmed rows for chosen activities */
+.matrix-program-group .ant-table-tbody > tr.matrix-row-chosen > td {
+  background: #f8f8f8;
+  color: #aaa;
+}
+
+.matrix-program-group .ant-table-tbody > tr.matrix-row-chosen:hover > td {
+  background: #f0f0f0 !important;
+}
+
+.matrix-program-group .ant-table-tbody > tr.matrix-row-chosen .ant-tag {
+  opacity: 0.7;
+}
+
+.matrix-program-group .ant-table-tbody > tr.matrix-row-chosen td:first-child {
+  font-weight: 400;
+  color: #bbb;
+}
+
+/* Embedded Activity Card (inside Drawer) */
+.activity-card-embedded {
+  padding: 0;
+}
+
+.activity-card-embedded .card-content {
+  padding-top: 0;
+}
+
+.activity-card-embedded .card-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+/* Drawer overrides */
+.ant-drawer-body {
+  overflow-y: auto;
+}
+
+.ant-drawer-body .year-budget-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.ant-drawer-body .year-budget-item {
+  min-width: 100px;
+}
+
+.ant-drawer-body .drawing-panel {
+  height: 350px;
+}
+
+.ant-drawer-body .checkbox-list {
+  max-height: 200px;
+}
+
+.ant-drawer-body .content-section {
+  margin-bottom: 20px;
+}
+
+.ant-drawer-body .card-content {
+  padding-top: 8px;
+}
+
+/* OP Document Preview Card */
+.op-preview-card {
+  margin-bottom: 16px;
+  border: 1px solid #d6e4ff;
+  background: #fafcff;
+}
+
+.op-preview-card .ant-card-head {
+  background: #f0f5ff;
+  border-bottom: 1px solid #d6e4ff;
+}
+
+.op-preview-card .ant-card-head-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a3a5c;
+}
+
+.op-preview-chart {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.op-preview-card .ant-divider {
+  border-color: #d6e4ff;
+}

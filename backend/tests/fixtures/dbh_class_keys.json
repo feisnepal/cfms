@@ -1,0 +1,157 @@
+{
+  "guideline_2061": {
+    "is_active": true,
+    "is_system_default": true,
+    "classes": [
+      {
+        "key": "0_4",
+        "lower": 0,
+        "upper": 4
+      },
+      {
+        "key": "4_10",
+        "lower": 4,
+        "upper": 10
+      },
+      {
+        "key": "10_20",
+        "lower": 10,
+        "upper": 20
+      },
+      {
+        "key": "20_30",
+        "lower": 20,
+        "upper": 30
+      },
+      {
+        "key": "30_40",
+        "lower": 30,
+        "upper": 40
+      },
+      {
+        "key": "40_50",
+        "lower": 40,
+        "upper": 50
+      },
+      {
+        "key": "50_60",
+        "lower": 50,
+        "upper": 60
+      },
+      {
+        "key": "60_plus",
+        "lower": 60,
+        "upper": null
+      }
+    ]
+  },
+  "guideline_simple": {
+    "is_active": true,
+    "is_system_default": true,
+    "classes": [
+      {
+        "key": "seedling",
+        "lower": 0,
+        "upper": 4
+      },
+      {
+        "key": "sapling",
+        "lower": 4,
+        "upper": 10
+      },
+      {
+        "key": "pole",
+        "lower": 10,
+        "upper": 30
+      },
+      {
+        "key": "tree",
+        "lower": 30,
+        "upper": null
+      }
+    ]
+  },
+  "harvesting_cfmg": {
+    "is_active": true,
+    "is_system_default": true,
+    "classes": [
+      {
+        "key": "regeneration",
+        "lower": 0,
+        "upper": 10
+      },
+      {
+        "key": "advance_growth",
+        "lower": 10,
+        "upper": 40
+      },
+      {
+        "key": "mature_tree",
+        "lower": 40,
+        "upper": null
+      }
+    ]
+  },
+  "dfo_export": {
+    "is_active": true,
+    "is_system_default": true,
+    "classes": [
+      {
+        "key": "10_20",
+        "lower": 10,
+        "upper": 20
+      },
+      {
+        "key": "20_30",
+        "lower": 20,
+        "upper": 30
+      },
+      {
+        "key": "30_40",
+        "lower": 30,
+        "upper": 40
+      },
+      {
+        "key": "40_50",
+        "lower": 40,
+        "upper": 50
+      },
+      {
+        "key": "50_60",
+        "lower": 50,
+        "upper": 60
+      },
+      {
+        "key": "60_plus",
+        "lower": 60,
+        "upper": null
+      }
+    ]
+  },
+  "validation": {
+    "is_active": true,
+    "is_system_default": true,
+    "classes": [
+      {
+        "key": "regeneration",
+        "lower": 1,
+        "upper": 4
+      },
+      {
+        "key": "sapling",
+        "lower": 4,
+        "upper": 10
+      },
+      {
+        "key": "pole",
+        "lower": 10,
+        "upper": 30
+      },
+      {
+        "key": "tree",
+        "lower": 30,
+        "upper": 200
+      }
+    ]
+  }
+}

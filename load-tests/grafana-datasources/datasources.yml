@@ -1,0 +1,12 @@
+# load-tests/grafana-datasources/datasources.yml
+# Provision the InfluxDB (k6) datasource for the load-test Grafana stack.
+apiVersion: 1
+
+datasources:
+  - name: k6
+    type: influxdb
+    access: proxy
+    database: k6
+    user: admin
+    url: http://influxdb:8086
+    isDefault: true

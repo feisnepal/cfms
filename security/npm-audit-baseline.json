@@ -1,0 +1,146 @@
+{
+  "_comment": "H2.12 ratchet baseline. high/critical advisories already present when scanning was introduced (2026-08-24). CI fails on any package NOT listed here. Shrink this file; never grow it.",
+  "generated": "2026-08-24",
+  "audit_level": "high",
+  "packages": {
+    "@geoman-io/leaflet-geoman-free": {
+      "severity": "high",
+      "advisories": [],
+      "fixAvailable": true
+    },
+    "@redocly/openapi-core": {
+      "severity": "high",
+      "advisories": [],
+      "fixAvailable": true
+    },
+    "@vitest/coverage-v8": {
+      "severity": "critical",
+      "advisories": [],
+      "fixAvailable": true
+    },
+    "axios": {
+      "severity": "high",
+      "advisories": [
+        "1116673",
+        "1117574",
+        "1117576",
+        "1117577",
+        "1117580",
+        "1117581",
+        "1117583",
+        "1117587",
+        "1117589",
+        "1117591",
+        "1117593",
+        "1117595",
+        "1117858",
+        "1118607",
+        "1119404",
+        "1120125",
+        "1120547",
+        "1120643",
+        "1120645",
+        "1120647",
+        "1120649",
+        "1120650",
+        "1120652",
+        "1123882",
+        "1123885",
+        "1123957",
+        "1123959",
+        "1123971",
+        "1123973"
+      ],
+      "fixAvailable": true
+    },
+    "brace-expansion": {
+      "severity": "high",
+      "advisories": [
+        "1130588",
+        "1130591",
+        "1130734",
+        "1130737"
+      ],
+      "fixAvailable": true
+    },
+    "form-data": {
+      "severity": "high",
+      "advisories": [
+        "1120743"
+      ],
+      "fixAvailable": true
+    },
+    "js-yaml": {
+      "severity": "high",
+      "advisories": [
+        "1112715",
+        "1121860",
+        "1123911",
+        "1138115"
+      ],
+      "fixAvailable": true
+    },
+    "lodash": {
+      "severity": "high",
+      "advisories": [
+        "1115806",
+        "1115810"
+      ],
+      "fixAvailable": true
+    },
+    "nanoid": {
+      "severity": "high",
+      "advisories": [
+        "1139427"
+      ],
+      "fixAvailable": true
+    },
+    "picomatch": {
+      "severity": "high",
+      "advisories": [
+        "1115549",
+        "1115552"
+      ],
+      "fixAvailable": true
+    },
+    "react-router": {
+      "severity": "high",
+      "advisories": [
+        "1138769"
+      ],
+      "fixAvailable": true
+    },
+    "react-router-dom": {
+      "severity": "high",
+      "advisories": [],
+      "fixAvailable": true
+    },
+    "undici": {
+      "severity": "high",
+      "advisories": [
+        "1130715",
+        "1130718",
+        "1130726",
+        "1130729",
+        "1130731"
+      ],
+      "fixAvailable": true
+    },
+    "vite": {
+      "severity": "high",
+      "advisories": [
+        "1116229",
+        "1120784",
+        "1123525"
+      ],
+      "fixAvailable": true
+    },
+    "vitest": {
+      "severity": "critical",
+      "advisories": [
+        "1139528"
+      ],
+      "fixAvailable": true
+    }
+  }
+}

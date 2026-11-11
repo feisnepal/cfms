@@ -1,0 +1,14 @@
+# H2.12 / S2-23 — Trivy suppressions for the built images.
+#
+# Deliberately EMPTY. Unlike the npm and pip baselines, image scanning starts
+# clean: the images are rebuilt from a pinned base on every run, so a HIGH or
+# CRITICAL here is something a base-image bump or a package pin can fix, not
+# historical debt to be ratcheted down.
+#
+# `ignore-unfixed: true` is already set in the workflow, so findings with no
+# published fix do not reach this file — anything that lands here is fixable
+# and should be fixed rather than listed.
+#
+# To suppress one, add its CVE id on its own line WITH a comment giving the
+# reason and the date. An entry with no reason is indistinguishable from an
+# entry nobody understood.

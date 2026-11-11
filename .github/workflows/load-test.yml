@@ -1,0 +1,124 @@
+# .github/workflows/load-test.yml
+# Phase 11 — scheduled + manual k6 load-test gate for the tabbed Calculation
+# Detail / Workspace. Fails the run if Map Init p75 > 3s or error rate > 1%.
+#
+# Schedule: Mon 02:00 UTC (off-peak). Manual dispatch lets ops point the test
+# at any environment via `baseUrl`.
+#
+# Secrets (repo Settings -> Secrets and variables -> Actions):
+#   LOAD_TEST_AUTH_TOKEN   bearer token for the target environment
+#   LOAD_TEST_BASE_URL     default target when no `baseUrl` input is given
+#   LOAD_TEST_API_URL      default API base when no `apiUrl` input is given
+
+name: Load Test
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      baseUrl:
+        description: "Base URL of the app to test (defaults to LOAD_TEST_BASE_URL secret)."
+        required: false
+        default: ""
+      apiUrl:
+        description: "API base URL (defaults to LOAD_TEST_API_URL secret, else <baseUrl>/api)."
+        required: false
+        default: ""
+      calcIds:
+        description: "Comma-separated calc ids (defaults to the shared e2e demo calc)."
+        required: false
+        default: "15f64467-c857-4948-bb42-34eefadb88bc"
+      summaryExport:
+        description: "Write k6 summary JSON artifact (in addition to the standard output)."
+        type: boolean
+        required: false
+        default: true
+
+jobs:
+  load-test-k6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: load-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target URLs
+        id: urls
+        run: |
+          BASE="${{ github.event.inputs.baseUrl }}"
+          if [ -z "$BASE" ]; then BASE="${{ secrets.LOAD_TEST_BASE_URL }}"; fi
+          if [ -z "$BASE" ]; then BASE="http://localhost:4173"; fi
+          API="${{ github.event.inputs.apiUrl }}"
+          if [ -z "$API" ]; then API="${{ secrets.LOAD_TEST_API_URL }}"; fi
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "api=$API" >> "$GITHUB_OUTPUT"
+
+      - name: Install k6
+        run: |
+          wget -q -O /tmp/k6.tgz https://github.com/grafana/k6/releases/download/v0.49.0/k6-v0.49.0-linux-amd64.tar.gz
+          tar -xzf /tmp/k6.tgz -C /tmp
+          sudo mv /tmp/k6-*/k6 /usr/local/bin/
+          k6 version
+
+      # H5.6: without this the run measures the rate limiter, not the
+      # application. H2.8 applies RATE_LIMIT_DEFAULT (600/min) to every route
+      # and keys it on IDENTITY, not address — and this script shares one
+      # bearer token across every VU, so all 250 of them are a single identity
+      # sharing a single 600/minute budget. At one request per second per VU
+      # that is 15,000/min against a 600 ceiling: the result would be almost
+      # entirely 429s, and the p95 would describe how fast the limiter says no.
+      #
+      # config.py already anticipates exactly this: "Off only for deliberate
+      # load tests."
+      - name: Disable rate limiting on the target
+        run: |
+          echo "::warning::This run requires RATE_LIMIT_ENABLED=false on the target"
+          echo "environment. Without it the numbers describe the rate limiter."
+          echo "See runbooks/OPS-ASSETS-VERIFICATION.md §3."
+
+      - name: Run k6 load test
+        env:
+          # Read by the target stack, not by k6 — set it where the app runs.
+          RATE_LIMIT_ENABLED: "false"
+          BASE_URL: ${{ steps.urls.outputs.base }}
+          API_URL: ${{ steps.urls.outputs.api }}
+          TEST_AUTH_TOKEN: ${{ secrets.LOAD_TEST_AUTH_TOKEN }}
+          CALC_IDS: ${{ github.event.inputs.calcIds }}
+        run: |
+          k6 run \
+            --env BASE_URL="$BASE_URL" \
+            --env API_URL="$API_URL" \
+            --env TEST_AUTH_TOKEN="$TEST_AUTH_TOKEN" \
+            --env CALC_IDS="$CALC_IDS" \
+            --summary-export load-test-summary.json \
+            k6-map-workspace.js
+
+      - name: Upload k6 summary artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary
+          path: load-tests/load-test-summary.json
+          retention-days: 30
+
+      - name: Fail if thresholds breached (map init p75 > 3s or error rate > 1%)
+        run: |
+          node -e "
+            const fs = require('fs');
+            const s = JSON.parse(fs.readFileSync('load-test-summary.json', 'utf8'));
+            const m = s.metrics || {};
+            let failed = false;
+            const mapInitP75 = m.map_init_time?.values?.['p(75)'];
+            const errRate = m.api_errors?.values?.rate ?? m.http_req_failed?.values?.rate;
+            if (mapInitP75 != null && mapInitP75 > 3000) {
+              console.error('Map Init p75 = ' + (mapInitP75/1000).toFixed(2) + 's > 3s'); failed = true;
+            }
+            if (errRate != null && errRate > 0.01) {
+              console.error('Error rate = ' + (errRate*100).toFixed(2) + '% > 1%'); failed = true;
+            }
+            if (failed) process.exit(1);
+            console.log('Load test thresholds passed (map init p75 ok, error rate ok).');
+          "

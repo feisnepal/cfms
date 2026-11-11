@@ -1,0 +1,56 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+# test_op_api.py is a standalone manual script (run via
+# `python tests/test_op_api.py`), not a pytest module — its
+# `def test(name, fn)` helper confuses collection, so ignore it.
+# H1.7: --timeout guards against a hung test hanging the job indefinitely —
+# there was no timeout anywhere, in CI or locally. 300s is generous; the whole
+# serial suite runs in about ten minutes.
+#
+# Order randomisation (pytest-randomly) and parallelism (pytest-xdist) are
+# deliberately NOT enabled here. Both are opt-in per invocation so a developer
+# reproducing a failure gets a stable, serial run by default; CI turns them on
+# explicitly. See the test-backend job in .github/workflows/ci.yml.
+addopts = "-q --disable-pytest-warnings --ignore=tests/test_op_api.py --timeout=300"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+markers = [
+    "performance: Performance benchmark tests (slow, run separately)",
+    "real_registration: exercise the real PENDING-on-register flow (H2.1 / S1-01)",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "D",   # pydocstyle — docstring conventions
+    "E",   # pycodestyle — general style
+    "W",   # pycodestyle — warnings
+    "F",   # pyflakes — logic errors
+    "I",   # isort — import order
+    # H3.4 (S2-37). `except: pass` and `except: continue` are the two shapes
+    # that discard an exception outright, and both are now at zero — every
+    # remaining one carries a `# noqa` naming the reason it is ignorable.
+    # BLE001 (blind `except Exception`) is deliberately NOT here yet: 493
+    # handlers catch broadly and DO log, which is a different problem. It goes
+    # in behind H4.1's baseline ratchet, and the noqa reasons written for these
+    # two are already the suppressions it will want.
+    "S110",  # try-except-pass
+    "S112",  # try-except-continue
+]
+ignore = [
+    "D107",  # __init__ docstring (too noisy)
+    "D203",  # 1 blank line before class (incompatible with D211)
+    "D213",  # multi-line summary (incompatible with D212)
+    "D404",  # First word of docstring (WIP)
+    "D415",  # punctuation at end of summary (incompatible with D205)
+]
+# Treat these as errors (fail the build) for production code
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+# D100=module, D101=class, D103=public function docstring required
+# Enforce as errors via --select in CI

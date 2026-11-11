@@ -1,0 +1,13 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Demo Boundary" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[84.3, 28.1], [84.4, 28.1], [84.4, 28.2], [84.3, 28.2], [84.3, 28.1]]]
+      }
+    }
+  ]
+}

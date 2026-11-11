@@ -1,0 +1,51 @@
+# load-tests/docker-compose.k6.yml
+# Phase 11 — local k6 + InfluxDB + Grafana stack for load-test visualization.
+#
+# Start (while the frontend is served on :4173 and backend on :8001):
+#   docker compose -f load-tests/docker-compose.k6.yml up --abort-on-container-exit
+#
+# Grafana: http://localhost:3000 (anonymous admin) — dashboard is provisioned
+# from load-tests/grafana-dashboards/load-test-dashboard.json.
+
+services:
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+      - INFLUXDB_ADMIN_USER=admin
+      # H1.13 follow-up: no secret literal in a tracked file, even a
+      # throwaway one for a local load-test InfluxDB — a password that
+      # appears in the repo is a password someone will reuse.
+      - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASSWORD:?set INFLUXDB_ADMIN_PASSWORD in .env}
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    volumes:
+      - ./grafana-dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana-datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - influxdb
+
+  k6:
+    image: grafana/k6:latest
+    volumes:
+      - ./k6-map-workspace.js:/tests/k6-map-workspace.js
+    command: run --out influxdb=http://influxdb:8086/k6 /tests/k6-map-workspace.js
+    environment:
+      - BASE_URL=http://host.docker.internal:4173
+      - API_URL=http://host.docker.internal:8001/api
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    depends_on:
+      - influxdb
+
+volumes:
+  influxdb-data:

@@ -1,0 +1,28 @@
+# Ruff config for the CF backend.
+# We gate CI on real-bug rule sets (undefined names, bare excepts, unused
+# imports/vars, redefinitions). Pure style nits (line length, whitespace)
+# are intentionally NOT selected so the lint job stays a meaningful signal
+# rather than 900 pre-existing findings.
+[lint]
+select = [
+    "E9",    # syntax errors
+    "F821",  # undefined name (real bug risk)
+    "F822",  # undefined name in __all__
+    "F811",  # redefinition of unused name
+    "F841",  # assigned but never used
+    "F402",  # import shadowed by loop var
+    "E722",  # bare except
+    "F403",  # star import
+    # H3.16 / S3-36: naive `datetime.now()` is a timezone bug (Nepal is +05:45
+    # and machines run nowhere near UTC); `datetime.now(timezone.utc)` is the
+    # only form allowed. DTZ002/DTZ005 stay off — half the API's DB columns are
+    # still naive-local and flipping them now would serialize the wrong local
+    # time into timestamp columns; the sweep is sequenced with S3-36.
+    "DTZ003",  # use timezone-aware datetime.now(tz)
+]
+ignore = [
+    "E401",  # multiple imports on one line (tolerated in big files)
+]
+
+[format]
+quote-style = "double"

@@ -1,0 +1,41 @@
+{
+ "_comment": "H2.12 ratchet baseline. Advisories already present when scanning was introduced (2026-08-24). CI fails on anything NOT listed here. Shrink this file; never grow it. | 2026-08-25: fiona removed from this baseline because the DEPENDENCY was removed, not because the advisories were re-accepted. Its only use was one GPKG export, now written with pyogrio. Leaving the entry would have meant a future re-added fiona was silently ignored here.",
+ "generated": "2026-08-24",
+ "source": "backend/requirements.lock",
+ "packages": {
+  "pydantic-settings": {
+   "version": "2.14.1",
+   "advisories": [
+    "GHSA-4xgf-cpjx-pc3j"
+   ]
+  },
+  "python-dotenv": {
+   "version": "1.2.1",
+   "advisories": [
+    "GHSA-mf9w-mj56-hr94",
+    "PYSEC-2026-2270"
+   ]
+  },
+  "python-multipart": {
+   "version": "0.0.7",
+   "advisories": [
+    "GHSA-59g5-xgcq-4qw3",
+    "GHSA-5rvq-cxj2-64vf",
+    "GHSA-6jv3-5f52-599m",
+    "GHSA-mj87-hwqh-73pj",
+    "GHSA-pp6c-gr5w-3c5g",
+    "GHSA-v9pg-7xvm-68hf",
+    "GHSA-vffw-93wf-4j4q",
+    "GHSA-wp53-j4wj-2cfg",
+    "PYSEC-2026-1851",
+    "PYSEC-2026-1852",
+    "PYSEC-2026-3036",
+    "PYSEC-2026-3037",
+    "PYSEC-2026-3038",
+    "PYSEC-2026-3039",
+    "PYSEC-2026-3040",
+    "PYSEC-2026-3041"
+   ]
+  }
+ }
+}

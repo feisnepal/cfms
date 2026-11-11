@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"name": "SubA", "category": "plantation"}, "geometry": {"type": "Polygon", "coordinates": [[[85.553, 27.412], [85.557, 27.412], [85.557, 27.416], [85.553, 27.416], [85.553, 27.412]]]}}]}

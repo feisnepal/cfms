@@ -1,0 +1,9 @@
+    # File information (GPKG - primary export)
+    gpkg_filename = Column(String(255), nullable=True)
+    file_size_mb = Column(Float, nullable=True)
+    file_path = Column(Text, nullable=True)
+
+    # Excel export (regulation format)
+    excel_filename = Column(String(255), nullable=True)
+    excel_size_mb = Column(Float, nullable=True)
+    excel_path = Column(Text, nullable=True)

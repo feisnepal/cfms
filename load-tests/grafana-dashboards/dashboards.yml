@@ -1,0 +1,13 @@
+# load-tests/grafana-dashboards/dashboards.yml
+# Provision the load-test dashboard so Grafana auto-loads it on startup.
+apiVersion: 1
+
+providers:
+  - name: load-test
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards

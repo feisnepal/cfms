@@ -1,0 +1,204 @@
+# SLO recording and burn-rate alert rules (H5.7 · R-4).
+# Targets and reasoning: runbooks/SLO.md
+#
+# Recording rules first, alerts second. The ratios are recorded because each is
+# evaluated by four alerts at four windows; computing them once keeps the alert
+# expressions readable and keeps Prometheus from doing the same work sixteen
+# times.
+#
+# Probe and metrics traffic is excluded everywhere. It dwarfs real traffic and
+# would flatter every number — an outage with health checks still passing would
+# read as 99.9% available.
+
+groups:
+  # ── availability (S1: 99.5%) ─────────────────────────────────────────────
+  - name: cfms_slo_availability
+    interval: 30s
+    rules:
+      - record: cfms:requests:rate5m
+        expr: |
+          sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[5m]))
+      - record: cfms:errors:rate5m
+        expr: |
+          sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[5m]))
+
+      # One ratio per window the burn-rate alerts need. `or vector(0)` keeps the
+      # series defined when there is no traffic — without it the alert
+      # expression goes empty and an alert that evaluates to nothing looks
+      # exactly like an alert that is fine.
+      - record: cfms:error_ratio:5m
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[5m]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[5m]))) or vector(0)
+      - record: cfms:error_ratio:30m
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[30m]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[30m]))) or vector(0)
+      - record: cfms:error_ratio:1h
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[1h]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[1h]))) or vector(0)
+      - record: cfms:error_ratio:2h
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[2h]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[2h]))) or vector(0)
+      - record: cfms:error_ratio:6h
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[6h]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[6h]))) or vector(0)
+      - record: cfms:error_ratio:1d
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[1d]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[1d]))) or vector(0)
+      - record: cfms:error_ratio:3d
+        expr: >
+          (sum(rate(http_requests_total{handler!~"/health|/ready|/metrics",status=~"5.."}[3d]))
+           / sum(rate(http_requests_total{handler!~"/health|/ready|/metrics"}[3d]))) or vector(0)
+
+  # ── burn-rate alerts ─────────────────────────────────────────────────────
+  # Budget for a 99.5% target is 0.005. Burn rate = observed ratio / 0.005.
+  # Each alert needs BOTH windows over threshold: the long one says the problem
+  # is real, the short one says it is still happening — so the alert clears when
+  # the incident does instead of smouldering for the rest of the long window.
+  - name: cfms_slo_burn
+    rules:
+      - alert: CFMSErrorBudgetBurnFast
+        expr: |
+          cfms:error_ratio:1h > (14.4 * 0.005)
+          and
+          cfms:error_ratio:5m > (14.4 * 0.005)
+        for: 2m
+        labels:
+          severity: page
+          slo: availability
+        annotations:
+          summary: "Error budget burning 14.4x — exhausted in ~2 days"
+          description: >
+            {{ $value | humanizePercentage }} of requests are failing over the
+            last hour, and still failing now.
+          runbook: runbooks/RUNBOOK-INC-001-incidents.md#inc-1--5xx-spike
+
+      - alert: CFMSErrorBudgetBurnHigh
+        expr: |
+          cfms:error_ratio:6h > (6 * 0.005)
+          and
+          cfms:error_ratio:30m > (6 * 0.005)
+        for: 15m
+        labels:
+          severity: page
+          slo: availability
+        annotations:
+          summary: "Error budget burning 6x — exhausted in ~5 days"
+          runbook: runbooks/RUNBOOK-INC-001-incidents.md#inc-1--5xx-spike
+
+      - alert: CFMSErrorBudgetBurnMedium
+        expr: |
+          cfms:error_ratio:1d > (3 * 0.005)
+          and
+          cfms:error_ratio:2h > (3 * 0.005)
+        for: 1h
+        labels:
+          severity: ticket
+          slo: availability
+        annotations:
+          summary: "Error budget burning 3x — exhausted in ~10 days"
+
+      - alert: CFMSErrorBudgetBurnSlow
+        expr: |
+          cfms:error_ratio:3d > (1 * 0.005)
+          and
+          cfms:error_ratio:6h > (1 * 0.005)
+        for: 3h
+        labels:
+          severity: ticket
+          slo: availability
+        annotations:
+          summary: "Error budget will be exhausted by month end at this rate"
+
+  # ── latency (S2/S3) ──────────────────────────────────────────────────────
+  - name: cfms_slo_latency
+    interval: 30s
+    rules:
+      # Reads and writes are separated because they have different targets and
+      # mixing them makes both meaningless — a slow save would hide inside fast
+      # reads, which outnumber it.
+      - record: cfms:read_latency_p95:5m
+        expr: >
+          histogram_quantile(0.95, sum by (le) (rate(
+            http_request_duration_seconds_bucket{method="GET",handler!~"/health|/ready|/metrics"}[5m])))
+      - record: cfms:write_latency_p95:5m
+        expr: >
+          histogram_quantile(0.95, sum by (le) (rate(
+            http_request_duration_seconds_bucket{method=~"POST|PUT|PATCH|DELETE"}[5m])))
+
+      - alert: CFMSReadLatencyHigh
+        expr: cfms:read_latency_p95:5m > 1.5
+        for: 10m
+        labels: { severity: ticket, slo: latency }
+        annotations:
+          summary: "Read p95 {{ $value }}s exceeds the 1.5s objective"
+          description: >
+            On a single worker this is usually one slow handler blocking the
+            event loop rather than general load — see S1-17.
+          runbook: runbooks/RUNBOOK-INC-001-incidents.md#inc-1--5xx-spike
+
+      - alert: CFMSWriteLatencyHigh
+        expr: cfms:write_latency_p95:5m > 3
+        for: 10m
+        labels: { severity: ticket, slo: latency }
+        annotations:
+          summary: "Write p95 {{ $value }}s exceeds the 3s objective"
+
+  # ── saturation ───────────────────────────────────────────────────────────
+  # Not SLOs — leading indicators. These fire BEFORE users notice, which is the
+  # point: the availability alerts above are lagging by construction.
+  - name: cfms_saturation
+    rules:
+      - alert: CFMSDatabasePoolExhausted
+        # 90% of the ceiling. Sustained, not a spike — a brief peak is a busy
+        # minute, ten sustained minutes is a leak.
+        expr: |
+          cfms_db_pool_checked_out
+            / clamp_min(cfms_db_pool_size + cfms_db_pool_overflow, 1) > 0.9
+        for: 10m
+        labels: { severity: page, slo: saturation }
+        annotations:
+          summary: "Database pool over 90% for 10 minutes"
+          runbook: runbooks/RUNBOOK-INC-001-incidents.md#inc-2--database-saturation
+
+      - alert: CFMSMetricsCannotReadPool
+        # The gauges return -1 when they cannot read. Silence would be
+        # indistinguishable from a healthy zero, so it is alerted explicitly.
+        expr: cfms_db_pool_checked_out == -1 or cfms_calculation_queue_depth == -1
+        for: 5m
+        labels: { severity: ticket, slo: saturation }
+        annotations:
+          summary: "A saturation gauge cannot read its subsystem — monitoring is partially blind"
+
+      - alert: CFMSCalculationQueueStalled
+        # Depth alone cannot tell a busy queue from a stalled one: the worker is
+        # max_concurrency=1, so a queue is the normal shape of load. Age can.
+        # 30 min is longer than the 22-minute hard job timeout, so a job that
+        # will time out on its own does not page anybody.
+        expr: cfms_calculation_queue_oldest_seconds > 1800
+        for: 5m
+        labels: { severity: ticket, slo: freshness }
+        annotations:
+          summary: "Oldest queued calculation is {{ $value | humanizeDuration }} old"
+          runbook: runbooks/RUNBOOK-INC-001-incidents.md#inc-3--worker-backlog
+
+      - alert: CFMSDiskFillingUp
+        expr: |
+          node_filesystem_avail_bytes{mountpoint="/"}
+            / node_filesystem_size_bytes{mountpoint="/"} < 0.15
+        for: 15m
+        labels: { severity: page, slo: saturation }
+        annotations:
+          summary: "Less than 15% disk free"
+          description: >
+            Postgres goes READ-ONLY rather than crashing when it cannot write
+            WAL, so the API will stay up while every write fails.
+          runbook: runbooks/RUNBOOK-INC-001-incidents.md#inc-4--disk-full
+
+      # Requires node_exporter, which is not deployed. Recorded here rather than
+      # omitted so the gap is visible in the file that would use it.

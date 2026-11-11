@@ -1,0 +1,13 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Small Demo Boundary" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.55, 27.40], [85.57, 27.40], [85.57, 27.42], [85.55, 27.42], [85.55, 27.40]]]
+      }
+    }
+  ]
+}

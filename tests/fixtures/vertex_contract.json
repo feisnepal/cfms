@@ -1,0 +1,196 @@
+{
+  "_comment": [
+    "VR-2 vertex-classification CONTRACT fixture — the single source of truth",
+    "shared by backend/tests/services/test_vertex_classification_contract.py and",
+    "frontend/src/lib/__tests__/vertexClassifier.contract.test.ts.",
+    "",
+    "Both sides classify the SAME geometry with the SAME options and must return",
+    "identical {shared, shell, editable} flat index sets. Every bug in this",
+    "feature so far was two components disagreeing about a coordinate; this file",
+    "is the guard that makes such a disagreement fail CI instead of the browser.",
+    "",
+    "Index space: EXTERIOR rings only, closing duplicate dropped, parts in order.",
+    "Coordinates are metre-scale in degrees (~85.76E 27.41N, the demo forest), so",
+    "the 1 m coincidence tolerance behaves as it does in production.",
+    "",
+    "Spacing note: 0.001 deg lon at this latitude is ~99 m, 0.0001 deg is ~9.9 m."
+  ],
+  "cases": [
+    {
+      "name": "two_adjacent_blocks_shared_edge",
+      "why": "The base case. A and B share the edge x=85.7620; A's two vertices on it are shared, and with no shell they are editable.",
+      "layer_type": "blocks",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [
+        {
+          "id": "B",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7620, 27.4137], [85.7630, 27.4137], [85.7630, 27.4145], [85.7620, 27.4145], [85.7620, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": null,
+      "expected": { "shared": [1, 2], "shell": [], "editable": [1, 2], "vertex_count": 4 }
+    },
+    {
+      "name": "shell_wins_over_shared",
+      "why": "Rule 4. The same two shared vertices also sit on the parent shell, so they are locked and nothing is editable.",
+      "layer_type": "blocks",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [
+        {
+          "id": "B",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7620, 27.4137], [85.7630, 27.4137], [85.7630, 27.4145], [85.7620, 27.4145], [85.7620, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7630, 27.4137], [85.7630, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "expected": { "shared": [1, 2], "shell": [0, 1, 2, 3], "editable": [], "vertex_count": 4 }
+    },
+    {
+      "name": "polygon_with_hole",
+      "why": "D-3. The frontend used to index holes and the backend never did, so the two index spaces diverged for any polygon with one. The hole contributes NO indices; vertex_count stays 4.",
+      "layer_type": "blocks",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]],
+          [[85.7613, 27.4140], [85.7616, 27.4140], [85.7616, 27.4142], [85.7613, 27.4142], [85.7613, 27.4140]]
+        ]
+      },
+      "same_level_features": [
+        {
+          "id": "B",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7620, 27.4137], [85.7630, 27.4137], [85.7630, 27.4145], [85.7620, 27.4145], [85.7620, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": null,
+      "expected": { "shared": [1, 2], "shell": [], "editable": [1, 2], "vertex_count": 4 }
+    },
+    {
+      "name": "multipolygon_two_parts",
+      "why": "Indices run across parts in order: part 0 gives 0-3, part 1 gives 4-7. Only part 1 touches the neighbour.",
+      "layer_type": "blocks",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [[[85.7590, 27.4137], [85.7600, 27.4137], [85.7600, 27.4145], [85.7590, 27.4145], [85.7590, 27.4137]]],
+          [[[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+        ]
+      },
+      "same_level_features": [
+        {
+          "id": "B",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7620, 27.4137], [85.7630, 27.4137], [85.7630, 27.4145], [85.7620, 27.4145], [85.7620, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": null,
+      "expected": { "shared": [5, 6], "shell": [], "editable": [5, 6], "vertex_count": 8 }
+    },
+    {
+      "name": "mid_edge_vertex_on_neighbour_segment",
+      "why": "A vertex lying ON the neighbour's straight segment counts as shared even though the neighbour has no vertex there. Index 1 is the mid-edge point.",
+      "layer_type": "blocks",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7620, 27.4141], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [
+        {
+          "id": "B",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7620, 27.4137], [85.7630, 27.4137], [85.7630, 27.4145], [85.7620, 27.4145], [85.7620, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": null,
+      "expected": { "shared": [1, 2], "shell": [], "editable": [1, 2], "vertex_count": 4 }
+    },
+    {
+      "name": "isolated_feature_no_neighbours",
+      "why": "Nothing shared → nothing editable, even with no shell. A lone block offers no handles, which is the rule, not a fault.",
+      "layer_type": "blocks",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [],
+      "parent_shell": null,
+      "expected": { "shared": [], "shell": [], "editable": [], "vertex_count": 4 }
+    },
+    {
+      "name": "compartment_inside_block",
+      "why": "One level down. Two compartments share x=85.7615 inside the parent block; the vertices on the block shell are locked, leaving the interior pair editable.",
+      "layer_type": "compartments",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7615, 27.4137], [85.7615, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [
+        {
+          "id": "C2",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7615, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7615, 27.4145], [85.7615, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "expected": { "shared": [1, 2], "shell": [0, 1, 2, 3], "editable": [], "vertex_count": 4 }
+    },
+    {
+      "name": "compartment_with_no_block_level",
+      "why": "D-4. With no parent shell supplied nothing is locked, so the shared pair stays editable. The CALLER is responsible for falling back up the ladder to the forest boundary — resolve_parent_shell does that, and this case pins that the classifier itself does not invent a shell.",
+      "layer_type": "compartments",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7615, 27.4137], [85.7615, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [
+        {
+          "id": "C2",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[85.7615, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7615, 27.4145], [85.7615, 27.4137]]]
+          }
+        }
+      ],
+      "parent_shell": null,
+      "expected": { "shared": [1, 2], "shell": [], "editable": [1, 2], "vertex_count": 4 }
+    },
+    {
+      "name": "boundary_rule_a_all_editable",
+      "why": "Rule A. The boundary layer has no shell and no siblings; every vertex classifies editable and the no-structure gate lives in the caller.",
+      "layer_type": "boundary",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[85.7610, 27.4137], [85.7620, 27.4137], [85.7620, 27.4145], [85.7610, 27.4145], [85.7610, 27.4137]]]
+      },
+      "same_level_features": [],
+      "parent_shell": null,
+      "expected": { "shared": [], "shell": [], "editable": [0, 1, 2, 3], "vertex_count": 4 }
+    }
+  ]
+}
